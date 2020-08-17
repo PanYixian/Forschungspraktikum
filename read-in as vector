@@ -1,126 +1,54 @@
 ___________________________________________________________________________________________________________________________________________________
-//bubble sort
-//pointer. array cannot be passed into functions directly, so passing address.
+//read and store .xyz file as 2D vector
 
-void bubbleSort(int * arr, int length){
-    for (int i = 0; i < length - 1; i++) {
-        for (int j = i; j < length; j++) {
-            if (arr[i] > arr[j]) {
-                int temp = arr[i];
-                arr[i] = arr[j];
-                arr[j] = temp;
-            }
-        }
-    }
-}
-
-void printArr(int * arr, int length){
-    for (int i = 0; i < length; i++) {
-        cout << arr[i] << endl;
-    }
-}
-
-int main() {
-    
-    int arr[] = {4, 5, 3, 6, 7, 1, 2, 10, 8, 9};
-    int length = sizeof(arr) / sizeof(arr[0]);
-    
-    bubbleSort(arr, length);
-    
-    printArr(arr, length);
-    
-    return 0;
-}
-
-___________________________________________________________________________________________________________________________________________________
-#write to files
-
-void test01(){
-    
-    ofstream ofs;
-    ofs.open("test.txt", ios::out);
-    
-    ofs << "Name: Ana" << endl;
-    ofs << "Age: 20" << endl;
-    ofs << "Gender: female" << endl;
-    
-    ofs.close();
-}
-
-
-int main() {
-    
-    test01();
-    
-    return 0;
-}
-
-
-___________________________________________________________________________________________________________________________________________________
-#read files
-
-#include <string>
 #include <iostream>
 #include <fstream>
+#include <vector>
 using namespace std;
 
 int main()
 {
     ifstream fin;
     ofstream fout;
+    int atom_num;                                      //the number of atoms in the molecule
     
-//    string str = "0.12345";
-//    double num = stod(str);
-//    num++;
-//    cout << num << endl;
-
-    fin.open("CNH.xyz");
+    
+    fin.open("pent_A_center_S.xyz");                   //open the xyz file and test whether it works
     if(fin.fail())
         cout << "File failed to open." << endl;
 
-    char buf[1024] = {0};
-
-//    while (fin.getline(buf, sizeof(buf))) {
-//        cout << buf << endl;
-//    }
-
-    fin >> buf;
-    int n = stoi(buf);
-    double mol[n][3];
-    string atom_type [n];
+    fin >> atom_num;                                   //read in the number of atoms
     
-//    while (fin >> buf){
-//        for (int i = 0; i < n; i++) {
-//            fin >> buf;
-//            atom_type[i] = buf;
-//            for (int j = 1; j <= 3; j++) {
-//                fin >> buf;
-//                mol[i][j] = stod(buf);
-//            }
-//        }
-//    }
+    int i,j;
+    vector<vector<double>> coord(atom_num);            //define a 2D vector to store the coordinates
+    string atom_type[atom_num];                        //the type of atoms
     
-    do {
-        for (int i = 0; i < n; i++) {
-            fin >> buf;
-            atom_type[i] = buf;
-            for (int j = 0; j < 3; j++) {
-                fin >> buf;
-                mol[i][j] = stod(buf);
-            }
+    
+    for (i = 0; i < coord.size(); i++)                 //define 3 coordinates (x,y,z) for each atom
+        coord[i].resize(3);
+
+    for(i = 0; i < coord.size(); i++)
+    {
+        fin >> setprecision(9) >> atom_type[i];        //read in the type of each atom
+        cout << atom_type[i] << "\t";
+        for (j = 0; j < coord[0].size();j++)
+        {
+            fin >> coord[i][j];                        //read in the coordinates x,y,z for each atom
+            cout << setprecision(9)
+            << coord[i][j] << "\t";
         }
-    } while (fin >> buf);
-    
-    for (int i = 0; i < n; i++) {
-        cout << atom_type[i] << ' ' << mol[i][2] << endl;
+        cout << endl;
     }
-   
-//    fout.open("outputFile.txt");
+    
+    
+    return 0;
 }
+
+___________________________________________________________________________________________________________________________________________________
 
 
 ___________________________________________________________________________________________________________________________________________________
-#value passing and address passing into function, the use of pointer
+//value passing and address passing into function, the use of pointer
 
 #include <iostream>
 using namespace std;
@@ -165,7 +93,7 @@ int main() {
 
 
 ___________________________________________________________________________________________________________________________________________________
-#passing an array into a function is already passing address, it functions like pointer
+//passing an array into a function is already passing address, it functions like pointer
 
 #include <iostream>
 using namespace std;
@@ -217,62 +145,11 @@ int main() {
 
 
 ___________________________________________________________________________________________________________________________________________________
-//try read in as vector, not working yet
 
-#include <iostream>
-#include <fstream>
-#include <vector>
-using namespace std;
 
-int main()
-{
-    ifstream fin;
-    ofstream fout;
-    int atom_num;
-    vector<vector<double>> coord(100, vector<double>(3));
-    string atom_type[100];
-    char buf[1024] = {0};
-    double buffer;
-    
 
-    fin.open("ferrocene.xyz");
-    if(fin.fail())
-        cout << "File failed to open." << endl;
+___________________________________________________________________________________________________________________________________________________
 
-    coord.push_back(1);
-    fin >> atom_num;
-    
-//    while (fin >> buf){
-//        for (int i = 0; i < n; i++) {
-//            fin >> buf;
-//            atom_type[i] = buf;
-//            for (int j = 1; j <= 3; j++) {
-//                fin >> buf;
-//                mol[i][j] = stod(buf);
-//            }
-//        }
-//    }
-    
-    do {
-        for (int i = 0; i < atom_num; i++) {
-            fin >> atom_type[i];
-            for (int j = 0; j < 3; j++) {
-                fin >> buffer;
-                coord.push_back(buffer);
-            }
-        }
-    } while (fin >> buf);
-    
-    for (int i = 0; i < atom_num; i++) {
-        cout << atom_type[i] << " ";
-        for (int j = 0; j < 3; j++) {
-            cout << coord[i][j] << " ";
-        }
-        cout << endl;
-    }
-   
-//    fout.open("outputFile.txt");
-}
 
 
 ___________________________________________________________________________________________________________________________________________________
