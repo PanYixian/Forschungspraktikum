@@ -217,7 +217,62 @@ int main() {
 
 
 ___________________________________________________________________________________________________________________________________________________
+//try read in as vector, not working yet
 
+#include <iostream>
+#include <fstream>
+#include <vector>
+using namespace std;
+
+int main()
+{
+    ifstream fin;
+    ofstream fout;
+    int atom_num;
+    vector<vector<double>> coord(100, vector<double>(3));
+    string atom_type[100];
+    char buf[1024] = {0};
+    double buffer;
+    
+
+    fin.open("ferrocene.xyz");
+    if(fin.fail())
+        cout << "File failed to open." << endl;
+
+    coord.push_back(1);
+    fin >> atom_num;
+    
+//    while (fin >> buf){
+//        for (int i = 0; i < n; i++) {
+//            fin >> buf;
+//            atom_type[i] = buf;
+//            for (int j = 1; j <= 3; j++) {
+//                fin >> buf;
+//                mol[i][j] = stod(buf);
+//            }
+//        }
+//    }
+    
+    do {
+        for (int i = 0; i < atom_num; i++) {
+            fin >> atom_type[i];
+            for (int j = 0; j < 3; j++) {
+                fin >> buffer;
+                coord.push_back(buffer);
+            }
+        }
+    } while (fin >> buf);
+    
+    for (int i = 0; i < atom_num; i++) {
+        cout << atom_type[i] << " ";
+        for (int j = 0; j < 3; j++) {
+            cout << coord[i][j] << " ";
+        }
+        cout << endl;
+    }
+   
+//    fout.open("outputFile.txt");
+}
 
 
 ___________________________________________________________________________________________________________________________________________________
