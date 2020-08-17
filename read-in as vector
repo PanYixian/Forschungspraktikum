@@ -1,1 +1,223 @@
+___________________________________________________________________________________________________________________________________________________
+//bubble sort
+//pointer. array cannot be passed into functions directly, so passing address.
 
+void bubbleSort(int * arr, int length){
+    for (int i = 0; i < length - 1; i++) {
+        for (int j = i; j < length; j++) {
+            if (arr[i] > arr[j]) {
+                int temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+        }
+    }
+}
+
+void printArr(int * arr, int length){
+    for (int i = 0; i < length; i++) {
+        cout << arr[i] << endl;
+    }
+}
+
+int main() {
+    
+    int arr[] = {4, 5, 3, 6, 7, 1, 2, 10, 8, 9};
+    int length = sizeof(arr) / sizeof(arr[0]);
+    
+    bubbleSort(arr, length);
+    
+    printArr(arr, length);
+    
+    return 0;
+}
+
+___________________________________________________________________________________________________________________________________________________
+#write to files
+
+void test01(){
+    
+    ofstream ofs;
+    ofs.open("test.txt", ios::out);
+    
+    ofs << "Name: Ana" << endl;
+    ofs << "Age: 20" << endl;
+    ofs << "Gender: female" << endl;
+    
+    ofs.close();
+}
+
+
+int main() {
+    
+    test01();
+    
+    return 0;
+}
+
+
+___________________________________________________________________________________________________________________________________________________
+#read files
+
+#include <string>
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+int main()
+{
+    ifstream fin;
+    ofstream fout;
+    
+//    string str = "0.12345";
+//    double num = stod(str);
+//    num++;
+//    cout << num << endl;
+
+    fin.open("CNH.xyz");
+    if(fin.fail())
+        cout << "File failed to open." << endl;
+
+    char buf[1024] = {0};
+
+//    while (fin.getline(buf, sizeof(buf))) {
+//        cout << buf << endl;
+//    }
+
+    fin >> buf;
+    int n = stoi(buf);
+    double mol[n][3];
+    string atom_type [n];
+    
+//    while (fin >> buf){
+//        for (int i = 0; i < n; i++) {
+//            fin >> buf;
+//            atom_type[i] = buf;
+//            for (int j = 1; j <= 3; j++) {
+//                fin >> buf;
+//                mol[i][j] = stod(buf);
+//            }
+//        }
+//    }
+    
+    do {
+        for (int i = 0; i < n; i++) {
+            fin >> buf;
+            atom_type[i] = buf;
+            for (int j = 0; j < 3; j++) {
+                fin >> buf;
+                mol[i][j] = stod(buf);
+            }
+        }
+    } while (fin >> buf);
+    
+    for (int i = 0; i < n; i++) {
+        cout << atom_type[i] << ' ' << mol[i][2] << endl;
+    }
+   
+//    fout.open("outputFile.txt");
+}
+
+
+___________________________________________________________________________________________________________________________________________________
+#value passing and address passing into function, the use of pointer
+
+#include <iostream>
+using namespace std;
+
+
+struct student {
+    string name;
+    int age;
+    int score;
+};
+
+//pass the value into function, value in main not gonna be changed
+void printStudent_1(student s1){
+    s1.age = 28;
+    cout << "----------apply print function 1----------" << endl;
+    cout << "Name: " << s1.name << endl;
+    cout << "Age: " << s1.age << endl;
+    cout << "Score: " << s1.score << endl;
+}
+
+//pass the address into function by pointer, value in main changes
+void printStudent_2(student *s1){
+    s1->age = 28;
+    cout << "----------apply print function 2----------" << endl;
+    cout << "Name: " << s1->name << endl;
+    cout << "Age: " << s1->age << endl;
+    cout << "Score: " << s1->score << endl;
+}
+
+
+int main() {
+    
+    student s1 = {"Ana", 23, 90};
+    cout << "before applying function, age = " << s1.age << endl;
+    printStudent_1(s1);
+    cout << "after applying function 1, age = " << s1.age << endl;
+    printStudent_2(&s1);
+    cout << "after applying function 2, age = " << s1.age << endl;
+    
+    return 0;
+}
+
+
+___________________________________________________________________________________________________________________________________________________
+#passing an array into a function is already passing address, it functions like pointer
+
+#include <iostream>
+using namespace std;
+
+
+struct student {
+    string name;
+    int age;
+    int score;
+};
+
+void bubbleSort(student stud[], int len){
+    for (int i = 0; i < len - 1; i++) {
+        for (int j = i; j < len; j++) {
+            if (stud[i].age > stud[j].age) {
+                student temp = stud[i];
+                stud[i] = stud[j];
+                stud[j] = temp;
+            }
+        }
+    }
+}
+
+void printList(student stud[], int len){
+    for (int i = 0; i < len; i++) {
+        cout << stud[i].name << " " << stud[i].age << " " << stud[i].score << endl;
+    }
+}
+
+int main() {
+    
+    student stud[] = {
+        {"Ana", 23, 90},
+        {"John", 22, 89},
+        {"May", 24, 88},
+        {"Kevin", 21, 98},
+        {"Lay", 25, 94},
+    };
+    
+    int len = sizeof(stud) / sizeof(stud[0]);
+    
+    printList(stud, len);
+    bubbleSort(stud, len);
+    cout << "------------------------------" << endl;
+    printList(stud, len);
+    
+    return 0;
+}
+
+
+___________________________________________________________________________________________________________________________________________________
+
+
+
+___________________________________________________________________________________________________________________________________________________
