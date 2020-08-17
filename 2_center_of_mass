@@ -1,6 +1,70 @@
 ___________________________________________________________________________________________________________________________________________________
+//assuming all the atoms with the same mass 1
 
+#include <iostream>
+#include <fstream>
+#include <vector>
+using namespace std;
 
+int main()
+{
+    ifstream fin;
+    ofstream fout;
+    int atom_num;                                      //the number of atoms in the molecule
+    
+    
+    fin.open("pent_A_center_S.xyz");                   //open the xyz file and test whether it works
+    if(fin.fail())
+        cout << "File failed to open." << endl;
+
+    fin >> atom_num;                                   //read in the number of atoms
+//    cout << atom_num << endl;;
+    
+    int i,j;
+    vector<vector<double>> coord(atom_num);            //define a 2D vector to store the coordinates
+    string atom_type[atom_num];                        //the type of atoms
+    
+    
+    for (i = 0; i < coord.size(); i++)                 //define 3 coordinates (x,y,z) for each atom
+        coord[i].resize(3);
+
+    for(i = 0; i < coord.size(); i++)
+    {
+        fin >> setprecision(9) >> atom_type[i];        //read in the type of each atom
+        cout << atom_type[i] << "\t";
+        for (j = 0; j < coord[0].size();j++)
+        {
+            fin >> coord[i][j];                        //read in the coordinates x,y,z for each atom
+            cout << setprecision(9)
+            << coord[i][j] << "\t";
+        }
+        cout << endl;
+    }
+    
+    double center[3];                                   //define the center of mass
+
+    cout << "the center of mass is: ";
+    for (i = 0; i < 3; i++) {                           //calculate the center of mass assuming all atoms with mass 1
+        double sum = 0;
+        for (j = 0; j < coord.size(); j++) {
+            sum = sum + coord[i][j];                    //x = sum of x of all atoms / n (y,z likewise)
+        }
+        center[i] = sum / atom_num;
+        cout << center[i] << " ";
+    }
+    cout << endl;
+    
+    double check = 0;                                   //check the center of mass
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < coord.size(); j++) {
+            check = check + center[i] - coord[i][j];
+        }
+        cout << check << endl;
+        check = 0;
+    }
+    
+    return 0;
+}
 
 
 ___________________________________________________________________________________________________________________________________________________
