@@ -22,5 +22,10 @@
     read the coordinate data and store as 2D vector
     calculate the center of mass, assuming all atomes with the same mass 1
         (think about using the real mass)
+    
+    the difference between array and vector: 
+        the size of array is fixed/static, the size of vector is dynamic
+        no big difference for this project because the number of atoms is given in the input files
+        currently have problem with pointer in vector, think about using array[n,3] or constructing a specific class 
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
