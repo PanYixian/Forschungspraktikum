@@ -26,14 +26,23 @@ int main()
     int atom_num;                                      //the number of atoms in the molecule
     
     
-    fin.open("pent_A_center_S.xyz");                   //open the xyz file and test whether it works
+    fin.open("pent_A_center_R.xyz");                   //open the xyz file and test whether it works
     if(fin.fail())
         cout << "File failed to open." << endl;
 
-    fin >> atom_num;                                   //read in the number of atoms
+    fin >> atom_num;                                   //read in the number of atoms in first line
 //    cout << atom_num << endl;;
     
-    int i,j;
+    
+    string energy[4];                                  //deal with the second line concerning energy
+    for (int i = 0; i < 4; i++) {
+        fin >> energy[i];
+        cout << energy[i] << " ";
+    }
+    cout << endl;
+    
+    
+    int i,j;                                           //start reading in the coordinates
     vector<vector<double>> coord(atom_num);            //define a 2D vector to store the coordinates
     string atom_type[atom_num];                        //the type of atoms
     
@@ -100,3 +109,4 @@ int main()
     
     return 0;
 }
+
