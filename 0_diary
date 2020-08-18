@@ -1,0 +1,12 @@
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+17.08.2020
+
+  start of 1. Forschungspraktikum
+  read the coordinate data and store as 2D vector
+  calculate the center of mass, assuming all atomes with the same mass 1
+    (think about using the real mass)
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+18.08.2020
+
+  translation of the molecule
