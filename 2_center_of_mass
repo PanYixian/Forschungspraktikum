@@ -7,11 +7,6 @@ ________________________________________________________________________________
 using namespace std;
 
 
-void translation(vector<vector<double>> coord, int num, double vector){
-    
-}
-
-
 int main()
 {
     ifstream fin;
@@ -23,10 +18,19 @@ int main()
     if(fin.fail())
         cout << "File failed to open." << endl;
 
-    fin >> atom_num;                                   //read in the number of atoms
-//    cout << atom_num << endl;;
+
+    fin >> atom_num;                                   //read the number of atoms in the first line of .xyz file
+
+
+    string energy[4];                                  //deal with the second line concerning energy
+    for (int i = 0; i < 4; i++) {
+        fin >> energy[i];
+        cout << energy[i] << " ";
+    }
+    cout << endl;
     
-    int i,j;
+    
+    int i,j;                                           //start reading in the coordinates
     vector<vector<double>> coord(atom_num);            //define a 2D vector to store the coordinates
     string atom_type[atom_num];                        //the type of atoms
     
@@ -68,12 +72,8 @@ int main()
         cout << check << endl;
         check = 0;
     }
-    
-//    double translation_vector[3];
-//    cout << "please enter the vector (x,y,z) for translation: " << endl;
-//    cin >> translation_vector[0] >> translation_vector[1] >> translation_vector[2];
-//    translation(coord, atom_num, translation_vector);
-    
+
+
     return 0;
 }
 
