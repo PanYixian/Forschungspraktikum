@@ -6,6 +6,12 @@ ________________________________________________________________________________
 #include <vector>
 using namespace std;
 
+
+void translation(vector<vector<double>> coord, int num, double vector){
+    
+}
+
+
 int main()
 {
     ifstream fin;
@@ -13,7 +19,7 @@ int main()
     int atom_num;                                      //the number of atoms in the molecule
     
     
-    fin.open("pent_A_center_S.xyz");                   //open the xyz file and test whether it works
+    fin.open("ferrocene.xyz");                         //open the xyz file and test whether it works
     if(fin.fail())
         cout << "File failed to open." << endl;
 
@@ -25,14 +31,14 @@ int main()
     string atom_type[atom_num];                        //the type of atoms
     
     
-    for (i = 0; i < coord.size(); i++)                 //define 3 coordinates (x,y,z) for each atom
+    for (i = 0; i < atom_num; i++)                     //define 3 coordinates (x,y,z) for each atom
         coord[i].resize(3);
 
-    for(i = 0; i < coord.size(); i++)
+    for(i = 0; i < atom_num; i++)
     {
         fin >> setprecision(9) >> atom_type[i];        //read in the type of each atom
         cout << atom_type[i] << "\t";
-        for (j = 0; j < coord[0].size();j++)
+        for (j = 0; j < 3;j++)
         {
             fin >> coord[i][j];                        //read in the coordinates x,y,z for each atom
             cout << setprecision(9)
@@ -44,27 +50,33 @@ int main()
     double center[3];                                   //define the center of mass
 
     cout << "the center of mass is: ";
-    for (i = 0; i < 3; i++) {                           //calculate the center of mass assuming all atoms with mass 1
+    for (j = 0; j < 3; j++) {                           //calculate the center of mass assuming all atoms with mass 1
         double sum = 0;
-        for (j = 0; j < coord.size(); j++) {
+        for (i = 0; i < atom_num; i++) {
             sum = sum + coord[i][j];                    //x = sum of x of all atoms / n (y,z likewise)
         }
-        center[i] = sum / atom_num;
-        cout << center[i] << " ";
+        center[j] = sum / atom_num;
+        cout << center[j] << " ";
     }
     cout << endl;
     
     double check = 0;                                   //check the center of mass
-    for (i = 0; i < 3; i++) {
-        for (j = 0; j < coord.size(); j++) {
-            check = check + center[i] - coord[i][j];
+    for (j = 0; j < 3; j++) {
+        for (i = 0; i < atom_num; i++) {
+            check = check + center[j] - coord[i][j];
         }
         cout << check << endl;
         check = 0;
     }
     
+//    double translation_vector[3];
+//    cout << "please enter the vector (x,y,z) for translation: " << endl;
+//    cin >> translation_vector[0] >> translation_vector[1] >> translation_vector[2];
+//    translation(coord, atom_num, translation_vector);
+    
     return 0;
 }
+
 
 
 ___________________________________________________________________________________________________________________________________________________
