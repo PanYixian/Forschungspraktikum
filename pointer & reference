@@ -1,4 +1,5 @@
-\\the use of pointer and reference when applying functions
+//the use of pointer and reference when applying functions, the essence of reference is still pointer
+//(int &ref = num;) equals to (int * const ref = &num;), ref is then a "nickname" of num
 
 
 #include <iostream>
