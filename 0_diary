@@ -1,4 +1,18 @@
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+18.08.2020
+
+    translation of the molecule
+    try to write a function to execute translation, which can get main() simpler and clearer
+    however, for the time being, pointer does not work with 2D vector, without pointer the value outside the function is not changed
+        (go find more about vector)
+        
+    the 1976 & 1978 (Acta. Cryst.) Kabsch papers are still too complicated to perceive....
+    
+    MOLFIT: A computer program for molecular superposition (P.K.Redington, Computers & Chemistry, Volume 16, Issue 3, 1992, 217-222)
+        
+    
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
 17.08.2020
 
     start of 1. Forschungspraktikum
@@ -7,11 +21,3 @@
         (think about using the real mass)
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
-18.08.2020
-
-    translation of the molecule
-    try to write a function to execute translation, which can get main() simpler and clearer
-    however, for the time being, pointer does not work with 2D vector, without pointer the value outside the function is not changed
-        (go find more about vector)
-    the 1976 & 1978 (Acta. Cryst.) Kabsch papers are still too complicated to perceive....
-    
