@@ -1,0 +1,47 @@
+\\the use of pointer and reference when applying functions
+
+
+#include <iostream>
+using namespace std;
+
+void swap01(int a, int b){
+    int temp = a;
+    a = b;
+    b = temp;
+}
+
+void swap02(int *a, int *b){
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+void swap03(int &a, int &b){
+    int temp = a;
+    a = b;
+    b = temp;
+}
+
+int main(){
+    
+    int a = 10;
+    int b = 20;
+    
+    swap01(a, b);
+    cout << "after swap01: a = " << a << ", b = " << b <<endl;
+    
+    a = 10;
+    b = 20;
+    
+    swap02(&a, &b);
+    cout << "after swap02: a = " << a << ", b = " << b <<endl;
+    
+    a = 10;
+    b = 20;
+    
+    swap03(a, b);
+    cout << "after swap03: a = " << a << ", b = " << b <<endl;
+
+    
+    return 0;
+}
