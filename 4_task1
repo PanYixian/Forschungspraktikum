@@ -1,0 +1,205 @@
+//task1: same geometry, but different atomic ordering, change the atom order in the 2nd file into the order in 1st file
+
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <cmath>
+using namespace std;
+
+
+void printCoord(vector<vector<double>> coord, int num, string atom_type[]){
+    for(int i = 0; i < num; i++)
+    {
+        cout << atom_type[i] << "\t";
+        for (int j = 0; j < 3; j++)
+        {
+            cout << setprecision(9) << coord[i][j] << "\t";
+        }
+        cout << endl;
+    }
+}
+
+
+
+int main()
+{
+    ifstream fin;
+    ofstream fout;
+    int atom_num_0, atom_num_1;                                      //the number of atoms in the molecule
+    
+    
+    fin.open("test01.xyz");                               //open the xyz file and test whether it works
+    if(fin.fail())
+        cout << "File failed to open." << endl;
+
+    fin >> atom_num_0;                                   //read in the number of atoms in first line
+    cout << atom_num_0 << endl;;
+    
+    
+//    string energy[2][4];                                   //deal with the second line concerning energy
+//    for (int i = 0; i < 4; i++) {
+//        fin >> energy[0][i];
+//        cout << energy[0][i] << " ";
+//    }
+//    cout << endl;
+    
+    
+    int i, j, k;                                              //start reading in the coordinates
+    vector<vector<double>> coord_0(atom_num_0);            //define a 2D vector to store the coordinates
+    string atom_type_0[atom_num_0];                        //the type of atoms
+    
+    
+    for (i = 0; i < atom_num_0; i++)                     //define 3 coordinates (x,y,z) for each atom
+        coord_0[i].resize(3);
+
+    for(i = 0; i < atom_num_0; i++)
+    {
+        fin >> setprecision(9) >> atom_type_0[i];           //read in the type of each atom
+        cout << atom_type_0[i] << "\t";
+        for (j = 0; j < 3; j++)
+        {
+            fin >> coord_0[i][j];                           //read in the coordinates x,y,z for each atom
+            cout << setprecision(9)
+            << coord_0[i][j] << "\t";
+        }
+        cout << endl;
+    }
+    fin.close();
+    
+    fin.open("test02.xyz");                               //open the xyz file and test whether it works
+    if(fin.fail())
+        cout << "File failed to open." << endl;
+        
+    fin >> atom_num_1;                                   //read in the number of atoms in first line
+    cout << atom_num_1 << endl;;
+        
+        
+    //    string energy[2][4];                                   //deal with the second line concerning energy
+    //    for (int i = 0; i < 4; i++) {
+    //        fin >> energy[0][i];
+    //        cout << energy[0][i] << " ";
+    //    }
+    //    cout << endl;
+        
+
+    vector<vector<double>> coord_1(atom_num_1);            //define a 2D vector to store the coordinates
+    string atom_type_1[atom_num_1];                        //the type of atoms
+        
+        
+    for (i = 0; i < atom_num_1; i++)                      //define 3 coordinates (x,y,z) for each atom
+        coord_1[i].resize(3);
+
+    for(i = 0; i < atom_num_1; i++){
+        fin >> setprecision(9) >> atom_type_1[i];           //read in the type of each atom
+        cout << atom_type_1[i] << "\t";
+        for (j = 0; j < 3; j++){
+            fin >> coord_1[i][j];                           //read in the coordinates x,y,z for each atom
+            cout << setprecision(9)
+            << coord_1[i][j] << "\t";
+        }
+        cout << endl;
+    }
+    
+    //build two n*n matrix for storing characteristic relative atom-atom distence
+    
+    double rel_dis_0[atom_num_0][atom_num_0], rel_dis_1[atom_num_1][atom_num_1];
+    
+    for (i = 0; i < atom_num_0; i++) {
+        for (j = 0; j < atom_num_0; j++) {
+            rel_dis_0[i][j] = sqrt(pow(coord_0[i][0] - coord_0[j][0], 2) +
+                                   pow(coord_0[i][1] - coord_0[j][1], 2) + pow(coord_0[i][2] - coord_0[j][2], 2));
+        }
+        for (j = 0; j < atom_num_0 - 1; j++) {
+            for (k = j + 1; k < atom_num_0; k++) {
+                if (rel_dis_0[i][j] > rel_dis_0[i][k]) {
+                    double temp = rel_dis_0[i][j];
+                    rel_dis_0[i][j] = rel_dis_0[i][k];
+                    rel_dis_0[i][k] = temp;
+                }
+            }
+        }
+    }
+    
+    for (i = 0; i < atom_num_1; i++) {
+        for (j = 0; j < atom_num_1; j++) {
+            rel_dis_1[i][j] = sqrt(pow(coord_1[i][0] - coord_1[j][0], 2) +
+                                   pow(coord_1[i][1] - coord_1[j][1], 2) + pow(coord_1[i][2] - coord_1[j][2], 2));
+        }
+        for (j = 0; j < atom_num_1 - 1; j++) {
+            for (k = j + 1; k < atom_num_1; k++) {
+                if (rel_dis_1[i][j] > rel_dis_1[i][k]) {
+                    double temp = rel_dis_1[i][j];
+                    rel_dis_1[i][j] = rel_dis_1[i][k];
+                    rel_dis_1[i][k] = temp;
+                }
+            }
+        }
+    }
+    
+    cout << "The relative sorted relative distance for each atom from the 1st input file:" << endl;
+    for (int i = 0; i < atom_num_0; i++) {
+        cout << atom_type_0[i] << "\t";
+        for (int j = 0; j < atom_num_0; j++) {
+            cout << rel_dis_0[i][j] << "\t";
+        }
+        cout << endl;
+    }
+    
+    cout << "The relative sorted relative distance for each atom from the 2nd input file:" << endl;
+    for (int i = 0; i < atom_num_1; i++) {
+        cout << atom_type_1[i] << "\t";
+        for (int j = 0; j < atom_num_1; j++) {
+            cout << rel_dis_1[i][j] << "\t";
+        }
+        cout << endl;
+    }
+    
+    //compare the relative distances and switch the atom order in 2nd file
+    
+    
+//    double center[3];                                   //define the center of mass
+//
+//    cout << "the center of mass is: ";
+//    for (j = 0; j < 3; j++) {                           //calculate the center of mass assuming all atoms with mass 1
+//        double sum = 0;
+//        for (i = 0; i < atom_num; i++) {
+//            sum = sum + coord[i][j];                    //x = sum of x of all atoms / n (y,z likewise)
+//        }
+//        center[j] = sum / atom_num;
+//        cout << center[j] << " ";
+//    }
+//    cout << endl;
+    
+//    double check = 0;                                   //check the center of mass
+//    for (j = 0; j < 3; j++) {
+//        for (i = 0; i < atom_num; i++) {
+//            check = check + center[j] - coord[i][j];
+//        }
+//        cout << check << endl;
+//        check = 0;
+//    }
+    
+//    double translation_vector[3];
+//    cout << "please enter the vector (x,y,z) for translation: " << endl;
+//    cin >> translation_vector[0] >> translation_vector[1] >> translation_vector[2];
+//    for (i = 0; i < atom_num; i++) {
+//        for (j = 0; j < 3; j++) {
+//            coord[i][j] = coord[i][j] + translation_vector[j];
+//        }
+//    }
+//
+////    printCoord(coord, atom_num, atom_type);
+//
+//    cout << "the center of mass after translation is: ";
+//    for (j = 0; j < 3; j++) {                           //calculate the center of mass assuming all atoms with mass 1
+//        double sum = 0;
+//        for (i = 0; i < atom_num; i++) {
+//            sum = sum + coord[i][j];                    //x = sum of x of all atoms / n (y,z likewise)
+//        }
+//        center[j] = sum / atom_num;
+//        cout << center[j] << " ";
+//    }
+//    cout << endl;
+    
+    return 0;
+}
