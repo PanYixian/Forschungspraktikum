@@ -1,0 +1,136 @@
+___________________________________________________________________________________________________________________________________________________
+#interesting things about string in python
+
+>>> name = 'panyixian'
+>>> name[1]
+'a'
+>>> name[1:3]
+'an'
+>>> name[:3]
+'pan'
+
+___________________________________________________________________________________________________________________________________________________
+#cube root of a real nunmber
+
+num = float(input('pls enter a real number: '))
+epsilon = 0.0001
+low = 0
+high = abs(num)
+guess = (low + high) / 2
+
+if abs(num) > 1:
+    while abs(abs(num) - guess**3) > epsilon:
+        if abs(num) > guess**3:
+            low = guess
+            guess = (low + high) / 2
+        else:
+            high = guess
+            guess = (low + high) / 2
+            
+if abs(num) > 0 and abs(num) < 1:
+    low = abs(num)
+    high = 1
+    guess = (low + high) / 2
+    while abs(abs(num) - guess**3) > epsilon:
+        if abs(num) > guess**3:
+            low = guess
+            guess = (low + high) / 2
+        else:
+            high = guess
+            guess = (low + high) / 2
+
+if num < 0:
+    guess = - guess
+
+print('the cube root of ' + str(num) + ' is ' + str(guess))
+
+___________________________________________________________________________________________________________________________________________________
+#factorial-iteration & recursion
+
+def fact_iter(n):
+    fact = 1
+    for i in range (1, n+1):
+        fact = fact * i
+    return fact
+
+def fact_recur(n):
+    if n == 1:
+        return 1
+    else:
+        return n * fact_recur(n-1)
+
+___________________________________________________________________________________________________________________________________________________
+#hanoi tower, recursion
+
+def printMove(fr, to):
+    print('move from ' + str(fr) + ' to ' + str(to))
+
+def makeMove(n, fr, to, spare):
+    if n == 1:
+        printMove(fr, to)
+    else:
+        makeMove(n-1, fr, spare, to)
+        makeMove(1, fr, to, spare)
+        makeMove(n-1, spare, to, fr)
+
+n = int(input('pls enter the number of disks: '))
+print('it takes following steps to move all the disks from Tower T1 to Tower T2: ')
+makeMove(n, 'T1', 'T2', 'T3')
+
+___________________________________________________________________________________________________________________________________________________
+#palindrome test, recursion
+
+def isPalindrome(s):
+
+    def toChar(s):
+        s = s.lower()
+        ans = ''
+        for c in s:
+            if c in 'abcdefghijklmnopqrstuvwxyz':
+                ans = ans + c
+        return ans
+
+    def isPal(s):
+        if len(s) <= 1:
+            return True
+        else:
+            return s[0] == s[-1] and isPal(s[1:-1])
+
+    return isPal(toChar(s))
+
+s = input('pls enter a sentence for palindrome check: ')
+if isPalindrome(s):
+    print('this is a palindrome')
+else:
+    print('this is not a palindrome')
+
+___________________________________________________________________________________________________________________________________________________
+#deal with files, read & write
+
+nameHandle = open('filename.txt', 'r')
+for line in nameHandle:
+    print(line)
+nameHandle.close()
+
+nameHandle = open('filename.txt', 'w')
+for i in range(2):
+    name = input('pls enter a name: ')
+    nameHandle.write(name + '\')
+nameHandle.close()
+
+
+___________________________________________________________________________________________________________________________________________________
+#tuples, ordered sequence of elements, mixed element types(cool....), immutable, cannot change element values
+
+
+
+
+___________________________________________________________________________________________________________________________________________________
+
+
+
+___________________________________________________________________________________________________________________________________________________
+
+
+
+___________________________________________________________________________________________________________________________________________________
