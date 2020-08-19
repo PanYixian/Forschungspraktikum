@@ -5,7 +5,7 @@
         calculate the relative distance (rel_dis) between all atoms
         sort the rel_dis, which is characteristic for each atom (exception not considered for the time being: symetric molecule)
         compare the rel_dis of each atom in 2 files, change the atom order in 2nd file into 1st file
-    
+        (a lot of loops now, think about optimization)
     
 
 
