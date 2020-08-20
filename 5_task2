@@ -1,0 +1,6 @@
+//task2: same geometry, but different order and global rotation/translation different
+//step1: read in 1st and 2nd file, calculate center of mass (centroid_0 and centroid_1)
+//step2: translation of centroid_1 to centroid_0
+//step3: calculate the relative atom-atom distances, reorder 2nd file
+//step4: apply Kabsch algorithm
+//step5: print the rotated 2nd file into a 3rd file (or rewrite 2nd file?)
