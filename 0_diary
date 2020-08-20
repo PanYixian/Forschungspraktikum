@@ -1,15 +1,21 @@
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 20.08.2020
 
-    (? rewrite 2nd file or print out in a 3rd file)
+    (? rewrite 2nd file or print out in a 3rd file) rewrite 2nd file
     
     when calculating the center of mass, the n atoms are assumed to have the same mass 1 (centroid: x = sum_of_x_i / n, y = sum_of_y_i / n, z = sum_of_z_i / n)
     how different would it be if the real atom masses are used? or it does not really matter here in molecule alignment with the same geometry? would it matter
     for different geometry or slight change of functional group?
     
+    present task1 to April:
+        - align the output with same fixed digits
+        - try to deal with totally symmetric molecules
+    
     Kabsch Algorithm:
         - function RMSD, root mean square deviation
-        - 
+        - calculate the centroid
+        - execute translation and overlap the centroid (would it be better to move both centroids to origin)
+        - kabsch
 
 
 
