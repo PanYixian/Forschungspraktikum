@@ -161,7 +161,30 @@ print('after remove duplicates, a_list: ', a_list)
 
 
 ___________________________________________________________________________________________________________________________________________________
+# Dictionary {}, use 'keys' to locate 'values', both can be mixed types, 'keys' immutable
 
+# more efficient way of calculating fibonacci by using dictionary
 
+def fib(n):
+    if n == 1:
+        return 1
+    elif n == 2:
+        return 2
+    else:
+        return (fib(n-1) + fib(n-2))
 
+def fib_dict(n, d):
+    if n in d:
+        return d[n]
+    else:
+        ans = fib_dict(n-1, d) + fib_dict(n-2, d)
+        d[n] = ans
+        return ans
+
+d = {1:1, 2:2}
+
+test = int(input('pls enter the number for fibonacci: '))
+
+print('using fib_dict: ', fib_dict(test, d))
+print('using fib: ', fib(test))
 ___________________________________________________________________________________________________________________________________________________
