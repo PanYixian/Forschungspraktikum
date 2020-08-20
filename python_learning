@@ -1,5 +1,5 @@
 ___________________________________________________________________________________________________________________________________________________
-#interesting things about string in python
+# interesting things about string in python
 
 >>> name = 'panyixian'
 >>> name[1]
@@ -10,7 +10,7 @@ ________________________________________________________________________________
 'pan'
 
 ___________________________________________________________________________________________________________________________________________________
-#cube root of a real nunmber
+# cube root of a real nunmber
 
 num = float(input('pls enter a real number: '))
 epsilon = 0.0001
@@ -45,7 +45,7 @@ if num < 0:
 print('the cube root of ' + str(num) + ' is ' + str(guess))
 
 ___________________________________________________________________________________________________________________________________________________
-#factorial-iteration & recursion
+# Factorial-iteration & recursion
 
 def fact_iter(n):
     fact = 1
@@ -60,7 +60,7 @@ def fact_recur(n):
         return n * fact_recur(n-1)
 
 ___________________________________________________________________________________________________________________________________________________
-#hanoi tower, recursion
+# Hanoi tower, recursion
 
 def printMove(fr, to):
     print('move from ' + str(fr) + ' to ' + str(to))
@@ -78,7 +78,7 @@ print('it takes following steps to move all the disks from Tower T1 to Tower T2:
 makeMove(n, 'T1', 'T2', 'T3')
 
 ___________________________________________________________________________________________________________________________________________________
-#palindrome test, recursion
+# Palindrome test, recursion
 
 def isPalindrome(s):
 
@@ -120,13 +120,44 @@ nameHandle.close()
 
 
 ___________________________________________________________________________________________________________________________________________________
-#tuples, ordered sequence of elements, mixed element types(cool....), immutable, cannot change element values
+# Tuple (), ordered sequence of elements, mixed element types(cool....), immutable, cannot change element values, iterable
 
+tu = (1, 'ten', 3, 'seven', 5, 6)
 
+def get_data(a_Tuple):
+    nums = ()
+    words = ()
+    for t in aTuple:
+        nums = nums + (t[0],)
+        if t[1] not in words:
+            words = words + (t[1],)
+    min_nums = min(nums)
+    max_nums = max(nums)
+    unique_words = len(words)
+    return (min_nums, max_nums, unique_words)
+
+(small, large, words) = get_data(((1, 'mine'),
+                                  (3, 'yours'),
+                                  (5, 'ours'),
+                                  (7, 'mine')))
 
 
 ___________________________________________________________________________________________________________________________________________________
+# List [], ordered sequence of elements, usually the same type, mutable, elements can be changed, iterable
 
+def remove_dups(L1, L2):
+    L1_copy = L1[:]
+    for e in L1_copy:
+        if e in L2:
+            L1.remove(e)
+
+a_list = [2, 3, 5, 7, 1]
+b_list = [1, 4, 6, 7, 9]
+
+print('before remove duplicates, a_list: ', a_list)
+print('before remove duplicates, b_list: ', b_list)
+remove_dups(a_list, b_list)
+print('after remove duplicates, a_list: ', a_list)
 
 
 ___________________________________________________________________________________________________________________________________________________
