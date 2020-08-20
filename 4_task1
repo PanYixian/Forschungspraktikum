@@ -19,9 +19,15 @@ int main()
     ofstream fout;
     int atom_num_0, atom_num_1;                                      //the number of atoms in the molecule
     int i, j, k;
+    cin.precision(8);
+    cout.precision(8);
+    fin.precision(8);
+    fout.precision(8);
+    cout << fixed;
+    fout << fixed;
     
     
-    fin.open("test3_1.xyz");                                         //open the 1st xyz file and test whether it work2
+    fin.open("test2_1.xyz");                                         //open the 1st xyz file and test whether it work2
     if(fin.fail())
         cout << "File failed to open." << endl;
 
@@ -51,7 +57,7 @@ int main()
     fin.close();
     
     
-    fin.open("test3_2.xyz");                                         //open the 2nd xyz file and test whether it works
+    fin.open("test2_2.xyz");                                         //open the 2nd xyz file and test whether it work3
     if(fin.fail())
         cout << "File failed to open." << endl;
         
@@ -158,7 +164,7 @@ int main()
     
     //print out the reorganized coordinates from 2nd file in a 3rd file
     
-    fout.open("test3_3.xyz");
+    fout.open("test2_3.xyz");
     fout << atom_num_1 << endl;
     
 //    for (int i = 0; i < 4; i++) {                             //deal with the second line concerning energy
@@ -168,12 +174,11 @@ int main()
     for (i = 0; i < atom_num_1; i++) {
         fout << atom_type_1[i] << "\t";
         for (j = 0; j < 3; j++) {
-            fout << setprecision(8) << coord_1[i][j] << " ";
+            fout << coord_1[i][j] << "\t";
         }
         fout << endl;
     }
     fout.close();
-    
     
 
     return 0;
@@ -188,7 +193,7 @@ void printCoord(vector<vector<double>> coord, int num, string atom_type[]){
         cout << atom_type[i] << "\t";
         for (int j = 0; j < 3; j++)
         {
-            cout << setprecision(9) << coord[i][j] << "\t";
+            cout << coord[i][j] << "\t";
         }
         cout << endl;
     }
@@ -199,10 +204,11 @@ void printDis(vector<vector<double>> rel_dis, int num){
     {
         for (int j = 0; j < num; j++)
         {
-            cout << setprecision(9) << rel_dis[i][j] << "\t";
+            cout << rel_dis[i][j] << "\t";
         }
         cout << endl;
     }
 }
+
 
 
