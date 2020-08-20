@@ -1,4 +1,17 @@
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+20.08.2020
+
+    (? rewrite 2nd file or print out in a 3rd file)
+    
+    when calculating the center of mass, the n atoms are assumed to have the same mass 1 (centroid: x = sum_of_x_i / n, y = sum_of_y_i / n, z = sum_of_z_i / n)
+    how different would it be if the real atom masses are used?
+    
+    Kabsch Algorithm:
+
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
 19.08.2020
 
     finish task1: same geometry, different atom order in 2 files
@@ -7,7 +20,6 @@
         compare the rel_dis of each atom in 2 files, change the atom order in 2nd file into 1st file
         (a lot of loops now, think about optimization)
     
-
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 18.08.2020
