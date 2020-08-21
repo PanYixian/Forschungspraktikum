@@ -192,7 +192,18 @@ int main()
     //2. SVD(Singular Value Decomposition) of A: A = U * S * V^T
     //2-1. calculate Symmetric Factorization Matrix F = A^T * A
     
+    vector<vector<double>> FactMatrix(3), trans_CovMatrix = transpose(CovMatrix, 3);
+    for (i = 0; i < 3; i++) FactMatrix[i].resize(3);
     
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 3; j++) {
+            double sum = 0;
+            for (k = 0; k < 3; k++) {
+                sum = sum + trans_CovMatrix[i][k] * CovMatrix[k][j];
+            }
+            FactMatrix[i][j] = sum;
+        }
+    }
     
     
     //2-2. calculate the eigenvalues and eigenvectors of F
