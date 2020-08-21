@@ -4,8 +4,7 @@
     Kabsch Algorithm:
         write the codes for Singular Value Decomposition (SVD)
         give it a try before applying library
-
-
+        stuck by calculating eigenvalues and eigenvectors, turn to external library Eigen
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 20.08.2020
