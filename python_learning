@@ -163,9 +163,11 @@ print('after remove duplicates, a_list: ', a_list)
 ___________________________________________________________________________________________________________________________________________________
 # Dictionary {}, use 'keys' to locate 'values', both can be mixed types, 'keys' immutable
 
-# more efficient way of calculating fibonacci by using dictionary
+# more efficient way of calculating fibonacci by using dictionary - store the calculated fib(n) in dictionary, call f(n) without duplicate calc
 
 def fib(n):
+    global total_call_num
+    total_call_num +=1
     if n == 1:
         return 1
     elif n == 2:
@@ -174,6 +176,8 @@ def fib(n):
         return (fib(n-1) + fib(n-2))
 
 def fib_dict(n, d):
+    global total_call_num
+    total_call_num +=1
     if n in d:
         return d[n]
     else:
@@ -185,6 +189,14 @@ d = {1:1, 2:2}
 
 test = int(input('pls enter the number for fibonacci: '))
 
-print('using fib_dict: ', fib_dict(test, d))
-print('using fib: ', fib(test))
+total_call_num = 0
+
+print('using fib_dict:', fib_dict(test, d))
+print('total number of calling:', total_call_num)
+
+total_call_num = 0
+
+print('using fib:', fib(test))
+print('total number of calling:', total_call_num)
+
 ___________________________________________________________________________________________________________________________________________________
