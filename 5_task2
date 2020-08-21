@@ -174,8 +174,43 @@ int main()
     //step4: apply Kabsch algorithm
     //1. compute the covariance matrix A = P_trans * Q, P is coord_0(reference), Q is coord_1(to be rotated)
     
-    vector<vector<double>> trans_coord_0 = transpose(coord_0, atom_num_0);
+    vector<vector<double>> trans_coord_0 = transpose(coord_0, atom_num_0), CovMatrix(3);
+    for (i = 0; i < 3; i++) CovMatrix[i].resize(3);
 
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 3; j++) {
+            double sum = 0;
+            for (k = 0; k < atom_num_0; k++) {
+                sum = sum + trans_coord_0[i][k] * coord_1[k][j];
+            }
+            CovMatrix[i][j] = sum;
+        }
+    }
+    
+//    printDis(CovMatrix, 3);
+    
+    //2. SVD(Singular Value Decomposition) of A: A = U * S * V^T
+    //2-1. calculate Symmetric Factorization Matrix F = A^T * A
+    
+    
+    
+    
+    //2-2. calculate the eigenvalues and eigenvectors of F
+    
+    
+    
+    
+    //2-3. calculate the matrix of singular values S and its inverse S^(-1)
+    
+    
+    
+    
+    //2-4. calculate the matrix of right singular vectors V and its transpose V^T
+    
+    
+    
+    
+    //2-5. calculate the matrix of left singular values U by U = A * V^T * S^(-1)
     
     
     
