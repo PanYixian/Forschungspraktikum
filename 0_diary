@@ -1,4 +1,13 @@
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+21.08.2020
+
+    Kabsch Algorithm:
+        write the codes for Singular Value Decomposition (SVD)
+        give it a try before applying library
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
 20.08.2020
 
     (? rewrite 2nd file or print out in a 3rd file) rewrite 2nd file
@@ -8,16 +17,14 @@
     for different geometry or slight change of functional group?
     
     present task1 to April:
-        - align the output with same fixed digits
+        - align the output with same fixed digits (solved)
         - try to deal with totally symmetric molecules
     
     Kabsch Algorithm:
         - function RMSD, root mean square deviation
         - calculate the centroid
         - execute translation and overlap the centroid (would it be better to move both centroids to origin)
-        - kabsch
-
-
+        - kabsch, find the optimal rotation matrix
 
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
