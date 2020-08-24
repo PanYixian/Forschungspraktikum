@@ -1,4 +1,14 @@
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+24.08.2020
+
+    Kabsch Algprithm:
+        learn about using the more commen library lapack and VMD (so lack of fundamental knowledge....)
+    
+    when comparing the relative distance (rel_dis) of each atom in 2 files, change the condition from "equal" to "minimal total deviation"
+    because rel_dis may be slightly different, "equal" does not work anymore
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
 21.08.2020
 
     Kabsch Algorithm:
