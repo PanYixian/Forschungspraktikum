@@ -17,3 +17,8 @@ MOLFIT: A computer program for molecular superposition (P.K.Redington, Computers
 - direct noniterative method for determining the unitary matrix which superimposes one structure upon the other
 - refine by improved SS algorithm (1991, Sippl & Stegbuchner)
 - !!! place the molecule centers at the origin (0,0,0)
+- superposition of two atoms: rotate the vector of one atom parallel to the other
+- Nyburg's algorithm: three subproblems of least-squares (x,y,z) (how is it iterated?)
+- SS algorithm: use first and second derivatives to determine minimum (possible problem of convergence)
+- BFGS algorithm: Euler rotation matrix
+- !!! initialization: align the first three vectors(atoms)? may save some later calculations?
