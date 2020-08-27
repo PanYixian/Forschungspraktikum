@@ -1,0 +1,246 @@
+//task1: same geometry, but different atomic ordering, change the atom order in the 2nd file into the order in 1st file
+
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <cmath>
+using namespace std;
+
+//function declarations
+
+void printCoord(vector<vector<double>> coord, int num, string atom_type[]);
+
+void printDis(vector<vector<double>> rel_dis, int num);
+
+
+int main()
+{
+    ifstream fin;
+    ofstream fout;
+    int atom_num_0, atom_num_1;                                      //the number of atoms in the molecule
+    int i, j, k;
+    cin.precision(8);
+    cout.precision(8);
+    fin.precision(8);
+    fout.precision(8);
+    cout << fixed;
+    fout << fixed;
+    
+    
+    fin.open("test4_1.xyz");                                         //open the 1st xyz file and test whether it works
+    if(fin.fail())
+        cout << "File failed to open." << endl;
+
+    fin >> atom_num_0;                                               //read in the number of atoms from the first line
+    
+//    string energy[4];                                              //deal with the second line concerning energy
+//    for (int i = 0; i < 4; i++) {
+//        fin >> energy[i];
+//        cout << energy[i] << " ";
+//    }
+//    cout << endl;
+    
+    vector<vector<double>> coord_0(atom_num_0);                      //define a 2D vector to store the coordinates
+    string atom_type_0[atom_num_0];                                  //the type of atoms
+    
+    for (i = 0; i < atom_num_0; i++)                                 //define 3 coordinates (x,y,z) for each atom
+        coord_0[i].resize(3);
+
+    for(i = 0; i < atom_num_0; i++)
+    {
+        fin  >> atom_type_0[i];                                      //read in the type of each atom
+        for (j = 0; j < 3; j++)
+        {
+            fin >> coord_0[i][j];                                    //read in the coordinates x,y,z for each atom
+        }
+    }
+    fin.close();
+    
+    
+    fin.open("test4_2.xyz");                                         //open the 2nd xyz file and test whether it works
+    if(fin.fail())
+        cout << "File failed to open." << endl;
+        
+    fin >> atom_num_1;
+
+    vector<vector<double>> coord_1(atom_num_1);
+    string atom_type_1[atom_num_1];
+        
+    for (i = 0; i < atom_num_1; i++)
+        coord_1[i].resize(3);
+
+    for(i = 0; i < atom_num_1; i++){
+        fin >> atom_type_1[i];
+        for (j = 0; j < 3; j++){
+            fin >> coord_1[i][j];
+        }
+    }
+    fin.close();
+    
+    cout << "The original coordinates from 2nd file:" << endl;
+    printCoord(coord_1, atom_num_1, atom_type_1);
+    cout << endl;
+    
+    
+    //build two n*n matrix for storing the characteristic relative atom-atom distances
+    
+    vector<vector<double>> rel_dis_0(atom_num_0), rel_dis_1(atom_num_1);
+    
+    for (i = 0; i < atom_num_1; i++){
+        rel_dis_0[i].resize(atom_num_0);
+        rel_dis_1[i].resize(atom_num_1);
+    }
+    
+    //calculate and sort the relative distances for each atom from the 1st file
+    
+    for (i = 0; i < atom_num_0; i++) {
+        for (j = 0; j < atom_num_0; j++) {
+            rel_dis_0[i][j] = sqrt(pow(coord_0[i][0] - coord_0[j][0], 2) +
+                                   pow(coord_0[i][1] - coord_0[j][1], 2) + pow(coord_0[i][2] - coord_0[j][2], 2));
+        }
+        for (j = 0; j < atom_num_0; j++) {
+            for (k = j + 1; k < atom_num_0; k++) {
+                if (rel_dis_0[i][j] > rel_dis_0[i][k]) {
+                    swap(rel_dis_0[i][j], rel_dis_0[i][k]);
+                }
+            }
+        }
+    }
+    
+    //calculate and sort the relative distances for each atom from the 2nd file
+    
+    for (i = 0; i < atom_num_1; i++) {
+        for (j = 0; j < atom_num_1; j++) {
+            rel_dis_1[i][j] = sqrt(pow(coord_1[i][0] - coord_1[j][0], 2) +
+                                   pow(coord_1[i][1] - coord_1[j][1], 2) + pow(coord_1[i][2] - coord_1[j][2], 2));
+        }
+        for (j = 0; j < atom_num_1; j++) {
+            for (k = j + 1; k < atom_num_1; k++) {
+                if (rel_dis_1[i][j] > rel_dis_1[i][k]) {
+                    swap(rel_dis_1[i][j], rel_dis_1[i][k]);
+                }
+            }
+        }
+    }
+    
+    //check the sorted relative distances
+    
+//    cout << "The sorted relative distance for each atom from the 1st input file:" << endl;
+//    printDis(rel_dis_0, atom_num_0);
+//    cout << endl;
+//
+//    cout << "The sorted relative distance for each atom from the 2nd input file:" << endl;
+//    printDis(rel_dis_1, atom_num_1);
+//    cout << endl;
+    
+    
+    //calculate the sum of relative distance deviation between each pair of atoms from two files
+    //find the minimum and switch the atom order in 2nd file
+    
+
+    
+    for (i = 0; i < atom_num_0; i++) {
+        
+        double min_dev = 10000;
+        double dev_sum = 0;
+        
+        for (j = i; j < atom_num_0; j++) {
+            dev_sum = 0;
+            for (k = 0; k < atom_num_0; k++) {
+                dev_sum = dev_sum + abs(rel_dis_0[i][k] - rel_dis_1[j][k]);
+            }
+            
+//            cout << i << " " << j << " " << dev_sum << " " << min_dev << endl;
+            
+            if (dev_sum < min_dev) {
+                swap(rel_dis_1[i], rel_dis_1[j]);
+                swap(coord_1[i], coord_1[j]);
+                string temp = atom_type_1[i];
+                atom_type_1[i] = atom_type_1[j];
+                atom_type_1[j] = temp;
+                
+                min_dev = dev_sum;
+//                printCoord(coord_1, atom_num_1, atom_type_1);
+            }
+//            cout << min_dev << endl;
+        }
+    }
+    
+    
+    
+//    //compare the relative distances and switch the atom order in 2nd file
+//
+//    for (i = 0; i < atom_num_0 - 1; i++) {
+//        for (j = i; j < atom_num_0 - 1; j++) {
+//            if (rel_dis_0[i] == rel_dis_1[j]) {
+//                swap(coord_1[i], coord_1[j]);            //switch the coordination in 2nd file
+//                string temp = atom_type_1[i];
+//                atom_type_1[i] = atom_type_1[j];
+//                atom_type_1[j] = temp;
+//
+//                swap(rel_dis_1[i], rel_dis_1[j]);        //switch the relative distance of the molecule from 2nd file
+//                break;
+//            }
+//        }
+//    }
+    
+    
+    cout << "The sorted relative distance for each atom from the 2nd input file after comparing:" << endl;
+    printDis(rel_dis_1, atom_num_1);
+    cout << endl;
+    
+    cout << "The coordinates from 1st file:" << endl;
+    printCoord(coord_0, atom_num_0, atom_type_0);
+    cout << endl;
+    
+    cout << "The coordinates from 2nd file after comparing:" << endl;
+    printCoord(coord_1, atom_num_1, atom_type_1);
+    
+    
+    //print out the reorganized coordinates from 2nd file in a 3rd file
+    
+//    fout.open("test2_3.xyz");
+//    fout << atom_num_1 << endl;
+//
+////    for (int i = 0; i < 4; i++) {                             //deal with the second line concerning energy
+////        fout << energy[i] << " ";
+////    }
+//    fout << endl;
+//    for (i = 0; i < atom_num_1; i++) {
+//        fout << atom_type_1[i] << "\t";
+//        for (j = 0; j < 3; j++) {
+//            fout << coord_1[i][j] << "\t";
+//        }
+//        fout << endl;
+//    }
+//    fout.close();
+    
+
+    return 0;
+}
+
+
+//function definitions
+
+void printCoord(vector<vector<double>> coord, int num, string atom_type[]){
+    for(int i = 0; i < num; i++)
+    {
+        cout << atom_type[i] << "\t";
+        for (int j = 0; j < 3; j++)
+        {
+            cout << coord[i][j] << "\t";
+        }
+        cout << endl;
+    }
+}
+
+void printDis(vector<vector<double>> rel_dis, int num){
+    for(int i = 0; i < num; i++)
+    {
+        for (int j = 0; j < num; j++)
+        {
+            cout << rel_dis[i][j] << "\t";
+        }
+        cout << endl;
+    }
+}
