@@ -2,7 +2,11 @@
 27.08.2020
 
     refine task1:
-
+        - create n*n matrix for characteristic relative distances (rel_dis)
+        - sort the rel_dis for each atom
+        - compare i-th atom from 1st file and j-th atom from 2nd file, calculate total deviation of k-th rel_dis
+        - switch j-th to i-th in 2nd file if the total deviation is smaller than last one
+        (not working well for totally symmetric molecules)
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 26.08.2020
