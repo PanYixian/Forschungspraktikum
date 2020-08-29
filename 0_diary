@@ -1,4 +1,10 @@
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+28.08.2020
+
+    SVD from lapack: implemented with Accelerate, not getting the output right
+    SVD from https://www.codeproject.com/Articles/1268576/Singular-Values-Decomposition-SVD-In-Cplusplus11-B, modify and try for superimpose
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
 27.08.2020
 
     refine task1:
