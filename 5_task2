@@ -14,11 +14,33 @@ using namespace std;
 
 //function declarations
 
-void printCoord(vector<vector<double>> coord, int num, string atom_type[]);
+void printCoord(vector<vector<double> > coord, int num, string atom_type[]);
 
-void printDis(vector<vector<double>> rel_dis, int num);
+void printDis(vector<vector<double> > rel_dis, int num);
 
-vector<vector<double>> transpose(vector<vector<double>>& A, int atom_num);
+vector<vector<double> > transpose(vector<vector<double> >& A, int atom_num);
+
+void svd(vector<vector<double> > matrix, vector<vector<double> >& s, vector<vector<double> >& u, vector<vector<double> >& v);
+
+void compute_evd(vector<vector<double> > matrix, vector<double>& eigenvalues, vector<vector<double> >& eigenvectors, size_t eig_count);
+
+void get_hermitian_matrix(vector<double> eigenvector, vector<vector<double> >& h_matrix);
+
+void get_hermitian_matrix_inverse(vector<double> eigenvector, vector<vector<double> >& ih_matrix);
+
+void jordan_gaussian_transform(vector<vector<double> > matrix, vector<double>& eigenvector);
+
+void get_inverse_diagonal_matrix(vector<std::vector<double> > matrix, vector<vector<double> >& inv_matrix);
+
+void matrix_by_matrix(vector<vector<double> > matrix1, vector<vector<double> >& matrix2, vector<vector<double> >& matrix3);
+
+void matrix_transpose(vector<vector<double> > matrix1, vector<vector<double> >& matrix2);
+
+void generate_matrix(vector<vector<double> >& matrix, size_t rows, size_t cols);
+
+void print_matrix(vector<vector<double> > matrix);
+
+void get_reduced_matrix(vector<vector<double> > matrix, vector<vector<double> >& r_matrix, size_t new_size);
 
 
 int main()
@@ -37,8 +59,10 @@ int main()
     cout << fixed;
     fout << fixed;
     
+    cout << "where is wrong...." <<endl;
     
-    fin.open("test1_1.xyz");                                         //open the 1st xyz file and test whether it work2
+//
+    fin.open("test4_1.xyz");                                         //open the 1st xyz file and test whether it work2
     if(fin.fail())
         cout << "File failed to open." << endl;
 
@@ -51,7 +75,7 @@ int main()
 //    }
 //    cout << endl;
     
-    vector<vector<double>> coord_0(atom_num_0);                      //define a 2D vector to store the coordinates
+    vector<vector<double> > coord_0(atom_num_0);                      //define a 2D vector to store the coordinates
     string atom_type_0[atom_num_0];                                  //the type of atoms
     
     for (i = 0; i < atom_num_0; i++)                                 //define 3 coordinates (x,y,z) for each atom
@@ -59,7 +83,7 @@ int main()
 
     for(i = 0; i < atom_num_0; i++)
     {
-        fin  >> atom_type_0[i];                                      //read in the type of each atom
+        fin >> atom_type_0[i];                                      //read in the type of each atom
         for (j = 0; j < 3; j++)
         {
             fin >> coord_0[i][j];                                    //read in the coordinates x,y,z for each atom
@@ -68,13 +92,13 @@ int main()
     fin.close();
     
     
-    fin.open("test1_2.xyz");                                         //open the 2nd xyz file and test whether it work3
+    fin.open("test4_2.xyz");                                         //open the 2nd xyz file and test whether it work3
     if(fin.fail())
         cout << "File failed to open." << endl;
         
     fin >> atom_num_1;
 
-    vector<vector<double>> coord_1(atom_num_1);
+    vector<vector<double> > coord_1(atom_num_1);
     string atom_type_1[atom_num_1];
         
     for (i = 0; i < atom_num_1; i++)
@@ -114,7 +138,7 @@ int main()
     //step3: calculate the relative atom-atom distances, reorder 2nd file
     //build two n*n matrix for storing the characteristic relative atom-atom distances
     
-    vector<vector<double>> rel_dis_0(atom_num_0), rel_dis_1(atom_num_1);
+    vector<vector<double> > rel_dis_0(atom_num_0), rel_dis_1(atom_num_1);
     
     for (i = 0; i < atom_num_1; i++){
         rel_dis_0[i].resize(atom_num_0);
@@ -156,17 +180,30 @@ int main()
     
     //compare the relative distances and switch the atom order in 2nd file
     
-    for (i = 0; i < atom_num_0 - 1; i++) {
-        for (j = i; atom_type_0 - 1; j++) {
-            if (rel_dis_0[i] == rel_dis_1[j]) {
-                swap(coord_1[i], coord_1[j]);            //switch the coordination in 2nd file
+    for (i = 0; i < atom_num_0; i++) {
+        
+        double min_dev = 10000;
+        double dev_sum = 0;
+        
+        for (j = i; j < atom_num_0; j++) {
+            dev_sum = 0;
+            for (k = 0; k < atom_num_0; k++) {
+                dev_sum = dev_sum + abs(rel_dis_0[i][k] - rel_dis_1[j][k]);
+            }
+            
+//            cout << i << " " << j << " " << dev_sum << " " << min_dev << endl;
+                
+            if (dev_sum < min_dev) {
+                swap(rel_dis_1[i], rel_dis_1[j]);
+                swap(coord_1[i], coord_1[j]);
                 string temp = atom_type_1[i];
                 atom_type_1[i] = atom_type_1[j];
                 atom_type_1[j] = temp;
-                
-                swap(rel_dis_1[i], rel_dis_1[j]);        //switch the relative distance of the molecule from 2nd file
-                break;
+                    
+                min_dev = dev_sum;
+//                printCoord(coord_1, atom_num_1, atom_type_1);
             }
+//            cout << min_dev << endl;
         }
     }
     
@@ -177,7 +214,7 @@ int main()
     
     //2. compute the covariance matrix A = P_trans * Q, P is coord_0(reference), Q is coord_1(to be rotated)
     
-    vector<vector<double>> trans_coord_0 = transpose(coord_0, atom_num_0), CovMatrix(3);
+    vector<vector<double> > trans_coord_0 = transpose(coord_0, atom_num_0), CovMatrix(3);
     for (i = 0; i < 3; i++) CovMatrix[i].resize(3);
 
     for (i = 0; i < 3; i++) {
@@ -193,7 +230,13 @@ int main()
 //    printDis(CovMatrix, 3);
     
     //3. SVD(Singular Value Decomposition) of A: A = U * S * V^T
-    
+    vector<vector<double> > u, v, s;
+
+    svd(CovMatrix, s, u, v);
+
+    cout << "\nS = \n"; print_matrix(s);
+    cout << "\nU = \n"; print_matrix(u);
+    cout << "\nV = \n"; print_matrix(v);
     
     
     
@@ -226,7 +269,7 @@ int main()
 
 //function definitions
 
-void printCoord(vector<vector<double>> coord, int num, string atom_type[]){
+void printCoord(vector<vector<double> > coord, int num, string atom_type[]){
     for(int i = 0; i < num; i++)
     {
         cout << atom_type[i] << "\t";
@@ -238,7 +281,7 @@ void printCoord(vector<vector<double>> coord, int num, string atom_type[]){
     }
 }
 
-void printDis(vector<vector<double>> rel_dis, int num){
+void printDis(vector<vector<double> > rel_dis, int num){
     for(int i = 0; i < num; i++)
     {
         for (int j = 0; j < num; j++)
@@ -249,15 +292,353 @@ void printDis(vector<vector<double>> rel_dis, int num){
     }
 }
 
-vector<vector<double>> transpose(vector<vector<double>>& A, int atom_num) {
+vector<vector<double> > transpose(vector<vector<double> >& A, int atom_num) {
     int rows = atom_num;
-    if (rows == 0) return {{}};
+//    if (rows == 0) return {{}};
     int cols = 3;
-    vector<vector<double>> r(cols, vector<double>(rows));
+    vector<vector<double> > r(cols, vector<double>(rows));
     for (int i = 0; i < rows; ++ i) {
         for (int j = 0; j < cols; ++ j) {
             r[j][i] = A[i][j];
         }
     }
     return r;
+}
+
+void svd(vector<vector<double> > matrix, vector<vector<double> >& s, vector<vector<double> >& u, vector<vector<double> >& v)
+{
+    vector<vector<double> > matrix_t;
+    matrix_transpose(matrix, matrix_t);
+
+    vector<vector<double> > matrix_product1;
+    matrix_by_matrix(matrix, matrix_t, matrix_product1);
+
+    vector<vector<double> > matrix_product2;
+    matrix_by_matrix(matrix_t, matrix, matrix_product2);
+
+    vector<vector<double> > u_1;
+    vector<vector<double> > v_1;
+
+    vector<double> eigenvalues;
+    compute_evd(matrix_product2, eigenvalues, v_1, 0);
+
+    matrix_transpose(v_1, v);
+
+    s.resize(matrix.size());
+    for (uint32_t index = 0; index < eigenvalues.size(); index++)
+    {
+        s[index].resize(eigenvalues.size());
+        s[index][index] = eigenvalues[index];
+    }
+
+    vector<vector<double> > s_inverse;
+    get_inverse_diagonal_matrix(s, s_inverse);
+
+    vector<vector<double> > av_matrix;
+    matrix_by_matrix(matrix, v, av_matrix);
+    matrix_by_matrix(av_matrix, s_inverse, u);
+}
+
+
+
+//computation of eigenvalues and eigenvectors of a given factorization matrix
+
+
+void compute_evd(vector<vector<double> > matrix, vector<double>& eigenvalues, vector<vector<double> >& eigenvectors, size_t eig_count)
+{
+    size_t m_size = matrix.size();
+    vector<double> vec;
+    vec.resize(m_size);
+    fill_n(vec.begin(), m_size, 1);
+
+    static vector<vector<double> > matrix_i;
+
+    if (eigenvalues.size() == 0 && eigenvectors.size() == 0)
+    {
+        eigenvalues.resize(m_size);
+        eigenvectors.resize(eigenvalues.size());
+        matrix_i = matrix;
+    }
+
+    vector<vector<double> > m;
+    m.resize(m_size);
+    for (uint32_t row = 0; row < m_size; row++)
+        m[row].resize(100);
+
+    double lambda_old = 0;
+
+    uint32_t index = 0;
+    bool is_eval = false;
+    while (is_eval == false)
+    {
+        for (uint32_t row = 0; row < m_size && (index % 100) == 0; row++)
+            m[row].resize(m[row].size() + 100);
+
+        for (uint32_t row = 0; row < m_size; row++)
+        {
+            m[row][index] = 0;
+            for (uint32_t col = 0; col < m_size; col++)
+                m[row][index] += matrix[row][col] * vec[col];
+        }
+
+        for (uint32_t col = 0; col < m_size; col++)
+            vec[col] = m[col][index];
+
+        if (index > 0)
+        {
+            double lambda = (m[0][index - 1] != 0) ? (m[0][index] / m[0][index - 1]) : m[0][index];
+            is_eval = (fabs(lambda - lambda_old) < 10e-10) ? true : false;
+
+            lambda = (fabs(lambda) >= 10e-6) ? lambda : 0;
+            eigenvalues[eig_count] = lambda;
+            lambda_old = lambda;
+        }
+        index++;
+    }
+
+    vector<vector<double> > matrix_new;
+
+    if (m_size > 1)
+    {
+        vector<vector<double> > matrix_tdoubleet;
+        matrix_tdoubleet.resize(m_size);
+
+        for (uint32_t row = 0; row < m_size; row++)
+        {
+            matrix_tdoubleet[row].resize(m_size);
+            for (uint32_t col = 0; col < m_size; col++)
+                matrix_tdoubleet[row][col] = (row == col) ? (matrix[row][col] - eigenvalues[eig_count]) : matrix[row][col];
+        }
+
+        vector<double> eigenvector;
+        jordan_gaussian_transform(matrix_tdoubleet, eigenvector);
+
+        vector<vector<double> > hermitian_matrix;
+        get_hermitian_matrix(eigenvector, hermitian_matrix);
+
+        vector<vector<double> > ha_matrix_product;
+        matrix_by_matrix(hermitian_matrix, matrix, ha_matrix_product);
+
+        vector<vector<double> > inverse_hermitian_matrix;
+        get_hermitian_matrix_inverse(eigenvector, inverse_hermitian_matrix);
+
+        vector<vector<double> > iha_matrix_product;
+        matrix_by_matrix(ha_matrix_product, inverse_hermitian_matrix, iha_matrix_product);
+
+        get_reduced_matrix(iha_matrix_product, matrix_new, m_size - 1);
+    }
+
+    if (m_size <= 1)
+    {
+        for (uint32_t index = 0; index < eigenvalues.size(); index++)
+        {
+            double lambda = eigenvalues[index];
+            vector<vector<double> > matrix_tdoubleet;
+            matrix_tdoubleet.resize(matrix_i.size());
+
+            for (uint32_t row = 0; row < matrix_i.size(); row++)
+            {
+                matrix_tdoubleet[row].resize(matrix_i.size());
+                for (uint32_t col = 0; col < matrix_i.size(); col++)
+                    matrix_tdoubleet[row][col] = (row == col) ? (matrix_i[row][col] - lambda) : matrix_i[row][col];
+            }
+
+            eigenvectors.resize(matrix_i.size());
+            jordan_gaussian_transform(matrix_tdoubleet, eigenvectors[index]);
+
+            double eigsum_sq = 0;
+            for (uint32_t v = 0; v < eigenvectors[index].size(); v++)
+                eigsum_sq += pow(eigenvectors[index][v], 2.0);
+
+            for (uint32_t v = 0; v < eigenvectors[index].size(); v++)
+                eigenvectors[index][v] /= sqrt(eigsum_sq);
+
+            eigenvalues[index] = sqrt(eigenvalues[index]);
+        }
+
+        return;
+    }
+
+    compute_evd(matrix_new, eigenvalues, eigenvectors, eig_count + 1);
+
+    return;
+}
+
+
+
+//find Hermitian matrix and its inverse
+
+
+void get_hermitian_matrix(vector<double> eigenvector, vector<vector<double> >& h_matrix)
+{
+    h_matrix.resize(eigenvector.size());
+    for (uint32_t row = 0; row < eigenvector.size(); row++)
+        h_matrix[row].resize(eigenvector.size());
+
+    h_matrix[0][0] = 1 / eigenvector[0];
+    for (uint32_t row = 1; row < eigenvector.size(); row++)
+        h_matrix[row][0] = -eigenvector[row] / eigenvector[0];
+
+    for (uint32_t row = 1; row < eigenvector.size(); row++)
+        h_matrix[row][row] = 1;
+}
+
+//template<typename double = long double>
+void get_hermitian_matrix_inverse(vector<double> eigenvector, vector<vector<double> >& ih_matrix)
+{
+    ih_matrix.resize(eigenvector.size());
+    for (uint32_t row = 0; row < eigenvector.size(); row++)
+        ih_matrix[row].resize(eigenvector.size());
+
+    ih_matrix[0][0] = eigenvector[0];
+    for (uint32_t row = 1; row < eigenvector.size(); row++)
+        ih_matrix[row][0] = -eigenvector[row];
+
+    for (uint32_t row = 1; row < eigenvector.size(); row++)
+        ih_matrix[row][row] = 1;
+}
+
+
+
+//Jordan-Gaussian transformation of a given factorization matrix
+
+
+void jordan_gaussian_transform(vector<vector<double> > matrix, vector<double>& eigenvector)
+{
+    const double eps = 10e-6;
+    bool eigenv_found = false;
+    
+    for (uint32_t s = 0; s < matrix.size() - 1 && !eigenv_found; s++)
+    {
+        uint32_t col = s;
+        double alpha = matrix[s][s];
+        while (col < matrix[s].size() && alpha != 0 && alpha != 1)
+            matrix[s][col++] /= alpha;
+
+        for (uint32_t col = s; col < matrix[s].size() && !alpha; col++)
+            swap(matrix[s][col], matrix[s + 1][col]);
+
+        for (uint32_t row = 0; row < matrix.size(); row++)
+        {
+            double gamma = matrix[row][s];
+            for (uint32_t col = s; col < matrix[row].size() && row != s; col++)
+                matrix[row][col] = matrix[row][col] - matrix[s][col] * gamma;
+        }
+
+        uint32_t row = 0;
+        while (row < matrix.size() &&
+            (s == matrix.size() - 1 || fabs(matrix[s + 1][s + 1]) < eps))
+            eigenvector.push_back(-matrix[row++][s + 1]);
+
+        if (eigenvector.size() == matrix.size())
+        {
+            eigenv_found = true; eigenvector[s + 1] = 1;
+            for (uint32_t index = s + 1; index < eigenvector.size(); index++)
+                eigenvector[index] = (fabs(eigenvector[index]) >= eps) ? eigenvector[index] : 0;
+        }
+    }
+}
+
+
+
+//find an inverse diagonal matrix S
+
+
+void get_inverse_diagonal_matrix(vector<std::vector<double> > matrix, vector<vector<double> >& inv_matrix)
+{
+    inv_matrix.resize(matrix.size());
+    for (uint32_t index = 0; index < matrix.size(); index++)
+    {
+        inv_matrix[index].resize(matrix[index].size());
+        inv_matrix[index][index] = 1.0 / matrix[index][index];
+    }
+}
+
+
+
+//compute an equivalent matrix B
+
+
+void get_reduced_matrix(vector<vector<double> > matrix, vector<vector<double> >& r_matrix, size_t new_size)
+{
+    r_matrix.resize(new_size);
+    size_t index_d = matrix.size() - new_size;
+    uint32_t row = index_d, row_n = 0;
+    while (row < matrix.size())
+    {
+        r_matrix[row_n].resize(new_size);
+        uint32_t col = index_d, col_n = 0;
+        while (col < matrix.size())
+            r_matrix[row_n][col_n++] = matrix[row][col++];
+
+        row++; row_n++;
+    }
+}
+
+
+
+//performs multiplication of two matrices
+
+
+void matrix_by_matrix(vector<vector<double> > matrix1, vector<vector<double> >& matrix2, vector<vector<double> >& matrix3)
+{
+    matrix3.resize(matrix1.size());
+    for (uint32_t row = 0; row < matrix1.size(); row++)
+    {
+        matrix3[row].resize(matrix1[row].size());
+        for (uint32_t col = 0; col < matrix1[row].size(); col++)
+        {
+            matrix3[row][col] = 0.00;
+            for (uint32_t k = 0; k < matrix1[row].size(); k++)
+                matrix3[row][col] += matrix1[row][k] * matrix2[k][col];
+        }
+    }
+}
+
+
+
+//find a transpose of a given matrix
+
+
+void matrix_transpose(vector<vector<double> > matrix1, vector<vector<double> >& matrix2)
+{
+    matrix2.resize(matrix1.size());
+    for (uint32_t row = 0; row < matrix1.size(); row++)
+    {
+        matrix2[row].resize(matrix1[row].size());
+        for (uint32_t col = 0; col < matrix1[row].size(); col++)
+            matrix2[row][col] = matrix1[col][row];
+    }
+}
+
+
+
+//generate and print out matrices
+
+
+void generate_matrix(vector<vector<double> >& matrix, size_t rows, size_t cols)
+{
+//    srand((unsigned int)time(nullptr));
+    matrix.resize(rows);
+    for (size_t row = 0; row < matrix.size(); row++)
+    {
+        matrix[row].resize(cols);
+        for (size_t col = 0; col < matrix[row].size(); col++)
+            cin >> matrix[row][col];
+//            matrix[row][col] = rand() % 20 - rand() % 20;
+    }
+}
+
+
+void print_matrix(vector<vector<double> > matrix)
+{
+    for (size_t row = 0; row < matrix.size(); row++)
+    {
+        for (size_t col = 0; col < matrix[row].size(); col++)
+            cout << matrix[row][col] << " ";
+
+        cout << "\n";
+    }
+
+    cout << "\n";
 }
