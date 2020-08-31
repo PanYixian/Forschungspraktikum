@@ -59,9 +59,8 @@ int main()
     cout << fixed;
     fout << fixed;
     
-    cout << "where is wrong...." <<endl;
     
-//
+
     fin.open("test4_1.xyz");                                         //open the 1st xyz file and test whether it work2
     if(fin.fail())
         cout << "File failed to open." << endl;
@@ -90,7 +89,7 @@ int main()
         }
     }
     fin.close();
-    
+//    printCoord(coord_0, atom_num_0, atom_type_0);
     
     fin.open("test4_2.xyz");                                         //open the 2nd xyz file and test whether it work3
     if(fin.fail())
@@ -111,6 +110,7 @@ int main()
         }
     }
     fin.close();
+//    printCoord(coord_1, atom_num_1, atom_type_1);
 
     
     //step2: calculate the centroids and translate them to origin
@@ -133,7 +133,8 @@ int main()
             coord_1[i][j] = coord_1[i][j] - center_1[j];
         }
     }
-    
+//    printCoord(coord_0, atom_num_0, atom_type_0);
+//    printCoord(coord_1, atom_num_1, atom_type_1);
     
     //step3: calculate the relative atom-atom distances, reorder 2nd file
     //build two n*n matrix for storing the characteristic relative atom-atom distances
@@ -161,6 +162,8 @@ int main()
         }
     }
     
+//    printDis(rel_dis_0, atom_num_0);
+    
     //calculate and sort the relative distances for each atom from the 2nd file
     
     for (i = 0; i < atom_num_1; i++) {
@@ -176,6 +179,8 @@ int main()
             }
         }
     }
+    
+//    printDis(rel_dis_1, atom_num_1);
     
     
     //compare the relative distances and switch the atom order in 2nd file
@@ -201,11 +206,15 @@ int main()
                 atom_type_1[j] = temp;
                     
                 min_dev = dev_sum;
+                
 //                printCoord(coord_1, atom_num_1, atom_type_1);
             }
 //            cout << min_dev << endl;
         }
     }
+    
+//    printCoord(coord_0, atom_num_0, atom_type_0);
+//    printCoord(coord_1, atom_num_1, atom_type_1);
     
     
     //step4: apply Kabsch algorithm
@@ -232,8 +241,11 @@ int main()
     //3. SVD(Singular Value Decomposition) of A: A = U * S * V^T
     vector<vector<double> > u, v, s;
 
+    
+    //problem occurs here
+    
     svd(CovMatrix, s, u, v);
-
+    
     cout << "\nS = \n"; print_matrix(s);
     cout << "\nU = \n"; print_matrix(u);
     cout << "\nV = \n"; print_matrix(v);
@@ -307,20 +319,32 @@ vector<vector<double> > transpose(vector<vector<double> >& A, int atom_num) {
 
 void svd(vector<vector<double> > matrix, vector<vector<double> >& s, vector<vector<double> >& u, vector<vector<double> >& v)
 {
+//    cout << "\nA = \n"; print_matrix(matrix);
+    
     vector<vector<double> > matrix_t;
     matrix_transpose(matrix, matrix_t);
+    
+//    print_matrix(matrix_t);
 
     vector<vector<double> > matrix_product1;
     matrix_by_matrix(matrix, matrix_t, matrix_product1);
+    
+//    print_matrix(matrix_product1);
 
     vector<vector<double> > matrix_product2;
     matrix_by_matrix(matrix_t, matrix, matrix_product2);
-
+    
+    print_matrix(matrix_product2);
+    
+    //problem occurs here
+    
     vector<vector<double> > u_1;
     vector<vector<double> > v_1;
-
+    
+    
     vector<double> eigenvalues;
     compute_evd(matrix_product2, eigenvalues, v_1, 0);
+    
 
     matrix_transpose(v_1, v);
 
@@ -352,6 +376,8 @@ void compute_evd(vector<vector<double> > matrix, vector<double>& eigenvalues, ve
     fill_n(vec.begin(), m_size, 1);
 
     static vector<vector<double> > matrix_i;
+    
+//    print_matrix(matrix);
 
     if (eigenvalues.size() == 0 && eigenvectors.size() == 0)
     {
@@ -359,6 +385,8 @@ void compute_evd(vector<vector<double> > matrix, vector<double>& eigenvalues, ve
         eigenvectors.resize(eigenvalues.size());
         matrix_i = matrix;
     }
+    
+//    cout << "problem here?";
 
     vector<vector<double> > m;
     m.resize(m_size);
