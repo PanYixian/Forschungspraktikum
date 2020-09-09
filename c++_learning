@@ -1,5 +1,23 @@
 ___________________________________________________________________________________________________________________________________________________
+// use iterator to print vector
+//1D
+void printVec(vector<int> &v){
+    for (vector<int>::iterator it = v.begin(); it != v.end(); it++) {
+        cout << *it <<" ";
+    }
+    cout << endl;
+}
 
+//2D
+void printVec(vector<vector<int>> &v){
+    for (vector<vector<int>>::iterator it = v.begin(); it != v.end(); it++) {
+        for (vector<int>::iterator it_sub = (*it).begin(); it_sub != (*it).end(); it_sub++) {
+            cout << *it_sub << " ";
+        }
+    }
+    cout << endl;
+}
+___________________________________________________________________________________________________________________________________________________
 //the use of pointer and reference when applying functions, the essence of reference is still pointer
 //(int &ref = num;) equals to (int * const ref = &num;), ref is then a "nickname" of num
 
