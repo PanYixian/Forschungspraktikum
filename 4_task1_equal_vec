@@ -1,5 +1,7 @@
 //task1: same geometry, but different atomic ordering, change the atom order in the 2nd file into the order in 1st file
 
+//condition equal for comparing atoms
+
 #include <iostream>
 #include <fstream>
 #include <vector>
