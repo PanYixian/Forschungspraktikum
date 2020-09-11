@@ -45,7 +45,7 @@ int main()
     fout << fixed;
     
     
-    fin.open("test2_1.xyz");                                         //open the 1st xyz file and test whether it work2
+    fin.open("test4_1.xyz");                                         //open the 1st xyz file and test whether it work2
     if(fin.fail())
         cout << "File failed to open." << endl;
 
@@ -75,7 +75,7 @@ int main()
     fin.close();
     
     
-    fin.open("test2_2.xyz");                                         //open the 2nd xyz file and test whether it work3
+    fin.open("test4_2.xyz");                                         //open the 2nd xyz file and test whether it work3
     if(fin.fail())
         cout << "File failed to open." << endl;
         
@@ -207,12 +207,11 @@ int main()
             }
         }
     
-    
     //step4: apply Kabsch algorithm
     //1. compute RMSD(coord_0, coord_1)
     
     double RMSD_1 = RMSD(coord_0, coord_1, atom_num_0);
-    cout << RMSD_1 << endl;
+    cout << "RMSD before rotation: " << RMSD_1 << endl;
 
     //2. compute the covariance matrix A = P_trans * Q, P is coord_0(reference), Q is coord_1(to be rotated)
 
@@ -239,7 +238,8 @@ int main()
             m(i,j) = CovMatrix[i][j];
         }
     }
-    cout << "Here is the matrix m:" << endl << m << endl;
+    
+    cout << "Here is the covariance matrix m:" << endl << m << endl;
     JacobiSVD<MatrixXf> svd(m, ComputeThinU | ComputeThinV);
     cout << "Its singular values are:" << endl << svd.singularValues() << endl;
     cout << "Its left singular vectors are the columns of the thin U matrix:" << endl << svd.matrixU() << endl;
@@ -257,7 +257,34 @@ int main()
         }
     }
 
+    cout << "rotation matrix:" << endl;
     printDis(RotMatrix, 3);
+    
+    //4. rotate the structure from 2nd file
+    
+    vector<vector<double>> coord_2(atom_num_1);
+    for (i = 0; i < atom_num_1; i++)
+        coord_2[i].resize(3);
+    
+    for (i = 0; i < atom_num_1; i++) {
+        coord_2[i][0] = RotMatrix[0][0]*coord_1[i][0]+RotMatrix[0][1]*coord_1[i][1]+RotMatrix[0][2]*coord_1[0][2];
+        coord_2[i][1] = RotMatrix[1][0]*coord_1[i][0]+RotMatrix[1][1]*coord_1[i][1]+RotMatrix[1][2]*coord_1[0][2];
+        coord_2[i][2] = RotMatrix[2][0]*coord_1[i][0]+RotMatrix[2][1]*coord_1[i][1]+RotMatrix[2][2]*coord_1[0][2];
+    }
+    
+    cout << "1st xyz file:" << endl;
+    printCoord(coord_0, atom_num_0, atom_type_0);
+    cout << "2nd xyz file:" << endl;
+    printCoord(coord_1, atom_num_1, atom_type_1);
+    cout << "the rotated 2nd xyz file:" << endl;
+    printCoord(coord_2, atom_num_1, atom_type_1);
+    
+    
+    
+    //5. calculate RMSD again
+    
+    double RMSD_2 = RMSD(coord_0, coord_2, atom_num_0);
+    cout << "RMSD after rotation: " << RMSD_2 << endl;
     
     
 //    Vector3f rhs(1, 0, 0);
