@@ -1,3 +1,7 @@
+//code modified from "https://www.codeproject.com/Articles/1268576/Singular-Values-Decomposition-SVD-In-Cplusplus11-B"
+//not working yet....
+
+
 //task2: same geometry, but different order and global rotation/translation different
 
 //step1: read in 1st and 2nd file, calculate center of mass (centroid_0 and centroid_1)
