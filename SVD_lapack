@@ -1,6 +1,10 @@
+//g++ -o test_lapack.x test_lapack.cpp -framework Accelerate
+//./test_lapack.x
+
 #include <iostream>
 #include <vector>
 #include <Accelerate/Accelerate.h>
+#include <fstream>
 
 using namespace std;
 
@@ -10,46 +14,44 @@ using namespace std;
 
 int main()
 {
-    char JOBU = 'A';
-    char JOBVT = 'A';
-    int M = 4, N = 2;
-    int LDA = M, LDU = M, INFO = 0, LWORK = 16, LDVT = 4;
+    char JOBU = 'S';
+    char JOBVT = 'S';
+    int M = 3, N = 3;
+    int LDA = M, LDU = M, INFO = 0, LWORK = 100, LDVT = 3;
 
-    vector<float> A, S, U, VT, WORK;
+    vector<double> A, S, U, VT, WORK;
 
-    A.push_back(2);
-    A.push_back(4);
-    A.push_back(1);
     A.push_back(3);
+    A.push_back(1);
     A.push_back(0);
+    A.push_back(1);
+    A.push_back(2);
+    A.push_back(1);
     A.push_back(0);
-    A.push_back(0);
-    A.push_back(0);
+    A.push_back(2);
+    A.push_back(1);
+    
+    S.push_back(0);
+    U.push_back(0);
+    VT.push_back(0);
+    WORK.push_back(0);
 
 //    dgetrf_(&dim, &dim, &*a.begin(), &LDA, ipiv, &info);
 //    dgetrs_(&trans, &dim, &nrhs, & *a.begin(), &LDA, ipiv, & *b.begin(), &LDB, &info);
-    sgesvd_(&JOBU, &JOBVT, &M, &N, &*A.begin(), &LDA, &*S.begin(), &*U.begin(), &LDU, &*VT.begin(), &LDVT, &*WORK.begin(), &LWORK, &INFO);
+    dgesvd_(&JOBU, &JOBVT, &M, &N, &*A.begin(), &LDA, &*S.begin(), &*U.begin(), &LDU, &*VT.begin(), &LDVT, &*WORK.begin(), &LWORK, &INFO);
 
-    cout << "U is:";
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            cout << U[i] << " ";
-        }
-        cout << endl;
-    }
+    cout << "U is:" << endl;
+    cout << U[0] << " " << U[3] << " " << U[6] << endl;
+    cout << U[1] << " " << U[4] << " " << U[7] << endl;
+    cout << U[2] << " " << U[5] << " " << U[8] << endl;
 
-    cout << "S is:";
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 2; j++) {
-            cout << S[i] << " ";
-        }
-        cout << endl;
-    }
+    cout << "S is:" << endl;
+    cout << S[0] << " " << S[1] << " " << S[2] << endl;
 
-    cout << "V^T is:";
-    for (int i = 0; i < 2; i++) {
-        for (int j = 0; j < 2; j++) {
-            cout << VT[i] << " ";
+    cout << "V^T is:" << endl;
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            cout << VT[M*i + j] << " ";
         }
         cout << endl;
     }
@@ -58,79 +60,3 @@ int main()
 
     return(0);
 }
-
-
-
-//#include <iostream>
-//#include <vector>
-//
-//using namespace std;
-//
-//extern "C" void dgetrf_(int* dim1, int* dim2, double* a, int* lda, int* ipiv, int* info);
-//extern "C" void dgetrs_(char *TRANS, int *N, int *NRHS, double *A, int *LDA, int *IPIV, double *B, int *LDB, int *INFO );
-//
-//int main()
-//{
-//    char trans = 'N';
-//    int dim = 2;
-//    int nrhs = 1;
-//    int LDA = dim;
-//    int LDB = dim;
-//    int info;
-//
-//    vector<double> a, b;
-//
-//    a.push_back(1);
-//    a.push_back(1);
-//    a.push_back(1);
-//    a.push_back(-1);
-//
-//    b.push_back(2);
-//    b.push_back(0);
-//
-//    int ipiv[3];
-//
-//    dgetrf_(&dim, &dim, &*a.begin(), &LDA, ipiv, &info);
-//    dgetrs_(&trans, &dim, &nrhs, & *a.begin(), &LDA, ipiv, & *b.begin(), &LDB, &info);
-//
-//
-//    std::cout << "solution is:";
-//    std::cout << "[" << b[0] << ", " << b[1] << "]" << std::endl;
-//    std::cout << "Info = " << info << std::endl;
-//
-//    return(0);
-//}
-
-
-
-//int main()
-//{
-//    char trans = 'N';
-//    int dim = 2;
-//    int nrhs = 1;
-//    int LDA = dim;
-//    int LDB = dim;
-//    int info;
-//
-//    vector<double> a, b;
-//
-//    a.push_back(1);
-//    a.push_back(1);
-//    a.push_back(1);
-//    a.push_back(-1);
-//
-//    b.push_back(2);
-//    b.push_back(0);
-//
-//    int ipiv[3];
-//
-//    dgetrf_(&dim, &dim, &*a.begin(), &LDA, ipiv, &info);
-//    dgetrs_(&trans, &dim, &nrhs, & *a.begin(), &LDA, ipiv, & *b.begin(), &LDB, &info);
-//
-//
-//    std::cout << "solution is:";
-//    std::cout << "[" << b[0] << ", " << b[1] << ", " << "]" << std::endl;
-//    std::cout << "Info = " << info << std::endl;
-//
-//    return(0);
-//}
