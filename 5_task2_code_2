@@ -73,7 +73,7 @@ int main() {
         fin.close();
         
         
-        fin.open("aspirin_3.xyz");                                         //open the 2nd xyz file and test whether it work3
+        fin.open("aspirin_2.xyz");                                         //open the 2nd xyz file and test whether it work3
         if(fin.fail())
             cout << "File failed to open." << endl;
             
