@@ -1,6 +1,7 @@
 //code modified from "https://github.com/willhooper/superpose/blob/master/src/superimposer.cpp"
 //working!!!
 
+//task2: same geometry, but different order and global rotation/translation different
 
 #include <iostream>
 #include <fstream>
