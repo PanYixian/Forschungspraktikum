@@ -1,8 +1,6 @@
 //code modified from "https://github.com/willhooper/superpose/blob/master/src/superimposer.cpp"
 //working!!!
 
-//task2: same geometry, but different order and global rotation/translation different
-
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -73,7 +71,7 @@ int main() {
         fin.close();
         
         
-        fin.open("aspirin_2.xyz");                                         //open the 2nd xyz file and test whether it work3
+        fin.open("aspirin_3.xyz");                                         //open the 2nd xyz file and test whether it work3
         if(fin.fail())
             cout << "File failed to open." << endl;
             
@@ -141,13 +139,13 @@ int main() {
     
     //check the sorted relative distances
     
-    cout << "The sorted relative distance for each atom from the 1st input file:" << endl;
-    printDis(rel_dis_0, atom_num_0);
-    cout << endl;
-    
-    cout << "The sorted relative distance for each atom from the 2nd input file:" << endl;
-    printDis(rel_dis_1, atom_num_1);
-    cout << endl;
+//    cout << "The sorted relative distance for each atom from the 1st input file:" << endl;
+//    printDis(rel_dis_0, atom_num_0);
+//    cout << endl;
+//
+//    cout << "The sorted relative distance for each atom from the 2nd input file:" << endl;
+//    printDis(rel_dis_1, atom_num_1);
+//    cout << endl;
     
     //compare the relative distances and switch the atom order in 2nd file
     
@@ -169,7 +167,7 @@ int main() {
                 swap(rel_dis_1[i], rel_dis_1[j]);
                 swap(coord_1[i], coord_1[j]);
                 
-                cout << atom_type_1[i] << " " << atom_type_1[j];
+//                cout << atom_type_1[i] << " " << atom_type_1[j];
                 
                 string temp = atom_type_1[i];
                 atom_type_1[i] = atom_type_1[j];
@@ -186,9 +184,9 @@ int main() {
     
     
     
-    cout << "The sorted relative distance for each atom from the 2nd input file after comparing:" << endl;
-    printDis(rel_dis_1, atom_num_1);
-    cout << endl;
+//    cout << "The sorted relative distance for each atom from the 2nd input file after comparing:" << endl;
+//    printDis(rel_dis_1, atom_num_1);
+//    cout << endl;
     
     cout << "The coordinates from 1st file:" << endl;
     printCoord(coord_0, atom_num_0, atom_type_0);
@@ -196,10 +194,12 @@ int main() {
     
     cout << "The coordinates from 2nd file after comparing:" << endl;
     printCoord(coord_1, atom_num_1, atom_type_1);
+    cout << endl;
     
     double RMSD_before, RMSD_after;
     RMSD_before = RMSD(coord_0, coord_1, atom_num_0);
-    cout << RMSD_before << endl;
+    cout << "RMSD before superimpose: " << RMSD_before << endl;
+    cout << endl;
     
     pair<vector<vector<double>>, vector<double>> val;
     vector<vector<double>> mtx(atom_num_1), coord_2(atom_num_1);
@@ -213,7 +213,9 @@ int main() {
     
     coord_2 = transpose(mtx);
     
+    cout << "The coordinates from 2nd file after superimpose:" << endl;
     printCoord(coord_2, atom_num_1, atom_type_1);
+    cout << endl;
     
 //    for(i = 0; i < atom_num_1; i++){
 //        for (j = 0; j < 3; j++){
@@ -223,7 +225,7 @@ int main() {
 //    }
     
     RMSD_after = RMSD(coord_0, coord_2, atom_num_0);
-    cout << RMSD_after << endl;
+    cout << "RMSD after superimpose: " << RMSD_after << endl;
     
 //    printDis(mtx, atom_num_0);
     
@@ -534,3 +536,4 @@ void printDis(vector<vector<double>> rel_dis, int num){
         cout << endl;
     }
 }
+
