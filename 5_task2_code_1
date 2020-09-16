@@ -65,7 +65,7 @@ int main()
     
     
 
-    fin.open("test1_1.xyz");                                         //open the 1st xyz file and test whether it work2
+    fin.open("aspirin_1.xyz");                                         //open the 1st xyz file and test whether it work2
     if(fin.fail())
         cout << "File failed to open." << endl;
 
@@ -98,7 +98,7 @@ int main()
     fin.close();
 //    printCoord(coord_0, atom_num_0, atom_type_0);
     
-    fin.open("test1_2.xyz");                                         //open the 2nd xyz file and test whether it work3
+    fin.open("aspirin_3.xyz");                                         //open the 2nd xyz file and test whether it work3
     if(fin.fail())
         cout << "File failed to open." << endl;
         
@@ -293,9 +293,9 @@ int main()
         coord_2[i].resize(3);
     
     for (i = 0; i < atom_num_1; i++) {
-        coord_2[i][0] = RotMatrix[0][0]*coord_1[i][0]+RotMatrix[0][1]*coord_1[i][1]+RotMatrix[0][2]*coord_1[0][2];
-        coord_2[i][1] = RotMatrix[1][0]*coord_1[i][0]+RotMatrix[1][1]*coord_1[i][1]+RotMatrix[1][2]*coord_1[0][2];
-        coord_2[i][2] = RotMatrix[2][0]*coord_1[i][0]+RotMatrix[2][1]*coord_1[i][1]+RotMatrix[2][2]*coord_1[0][2];
+        coord_2[i][0] = RotMatrix[0][0]*coord_1[i][0]+RotMatrix[0][1]*coord_1[i][1]+RotMatrix[0][2]*coord_1[i][2];
+        coord_2[i][1] = RotMatrix[1][0]*coord_1[i][0]+RotMatrix[1][1]*coord_1[i][1]+RotMatrix[1][2]*coord_1[i][2];
+        coord_2[i][2] = RotMatrix[2][0]*coord_1[i][0]+RotMatrix[2][1]*coord_1[i][1]+RotMatrix[2][2]*coord_1[i][2];
     }
     
     cout << "1st xyz file moved to origin:" << endl;
@@ -744,4 +744,3 @@ void print_matrix(vector<vector<double> > matrix)
 
     cout << "\n";
 }
-
