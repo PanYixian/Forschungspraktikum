@@ -4,6 +4,10 @@
     use Eigen to solve SVD and construct rotation matrix, works in a rough way
         works perfectly when superimposing plane triangles, works terriblely when adding dimension to tetrahedral
         seems weirdly squash 3D object onto plane....
+        (squash problem solved, result not accurate enough)
+        
+    try to improve Eigen and code_1
+    still not getting the output right from lapack
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 14.09.2020
