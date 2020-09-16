@@ -6,8 +6,8 @@
 //step1: read in 1st and 2nd file, calculate center of mass (centroid_0 and centroid_1)
 //step2: translation of centroid_1 and centroid_0 to origin
 //step3: calculate the relative atom-atom distances, reorder 2nd file
-//step4: apply Kabsch algorithm
-//step5: print the rotated 2nd file by rewriting the 2nd file
+//step4: apply Kabsch algorithm, rotate to superimpose
+//step5: move the rotated centroid to centroid_0
 
 #include <iostream>
 #include <fstream>
@@ -45,37 +45,40 @@ int main()
     fout << fixed;
     
     
-    fin.open("test4_1.xyz");                                         //open the 1st xyz file and test whether it work2
+    fin.open("test1_1.xyz");                                         //open the 1st xyz file and test whether it work2
     if(fin.fail())
         cout << "File failed to open." << endl;
 
-    fin >> atom_num_0;                                               //read in the number of atoms from the first line
+    fin >> atom_num_0;                                                //read in the number of atoms from the first line
     
-//    string energy[4];                                              //deal with the second line concerning energy
+//    string energy[4];                                               //deal with the second line concerning energy
 //    for (int i = 0; i < 4; i++) {
 //        fin >> energy[i];
 //        cout << energy[i] << " ";
 //    }
 //    cout << endl;
     
-    vector<vector<double>> coord_0(atom_num_0);                      //define a 2D vector to store the coordinates
+    vector<vector<double>> coord_0(atom_num_0), coord_0_original(atom_num_0);                      //define a 2D vector to store the coordinates
     string atom_type_0[atom_num_0];                                  //the type of atoms
     
-    for (i = 0; i < atom_num_0; i++)                                 //define 3 coordinates (x,y,z) for each atom
+    for (i = 0; i < atom_num_0; i++){                                 //define 3 coordinates (x,y,z) for each atom
         coord_0[i].resize(3);
-
+        coord_0_original[i].resize(3);
+    }
+    
     for(i = 0; i < atom_num_0; i++)
     {
         fin  >> atom_type_0[i];                                      //read in the type of each atom
         for (j = 0; j < 3; j++)
         {
             fin >> coord_0[i][j];                                    //read in the coordinates x,y,z for each atom
+            coord_0_original[i][j] = coord_0[i][j];
         }
     }
     fin.close();
     
     
-    fin.open("test4_2.xyz");                                         //open the 2nd xyz file and test whether it work3
+    fin.open("test1_2.xyz");                                         //open the 2nd xyz file and test whether it works
     if(fin.fail())
         cout << "File failed to open." << endl;
         
@@ -98,7 +101,7 @@ int main()
     
     //step2: calculate the centroids and translate them to origin
     
-    double center_0[3], center_1[2];
+    double center_0[3], center_1[3];
 
     for (j = 0; j < 3; j++) {                                          //calculate the center of mass assuming all atoms with mass 1
         double sum_0 = 0, sum_1 = 0;
@@ -109,6 +112,10 @@ int main()
         center_0[j] = sum_0 / atom_num_0;
         center_1[j] = sum_1 / atom_num_1;
     }
+    
+    cout << "centroid of 1st file: " << center_0[0] << " " << center_0[1] << " " << center_0[2] << endl;
+    cout << "centroid of 2nd file: " << center_1[0] << " " << center_1[1] << " " << center_1[2] << endl;
+    cout << endl;
     
     for (j = 0; j < 3; j++) {                                           //move the two centroids to the origin
         for (i = 0; i < atom_num_0; i++) {
@@ -207,11 +214,12 @@ int main()
             }
         }
     
-    //step4: apply Kabsch algorithm
+    
+    //step4: apply Kabsch algorithm, rotate to superimpose
     //1. compute RMSD(coord_0, coord_1)
     
     double RMSD_1 = RMSD(coord_0, coord_1, atom_num_0);
-    cout << "RMSD before rotation: " << RMSD_1 << endl;
+    cout << "RMSD before rotation: " << RMSD_1 << endl << endl;;
 
     //2. compute the covariance matrix A = P_trans * Q, P is coord_0(reference), Q is coord_1(to be rotated)
 
@@ -239,26 +247,62 @@ int main()
         }
     }
     
+//    int n = 1;
+//    MatrixXf m(3,3);
+//    for (i = 0; i < 3; i++) {
+//        for (j = 0; j < 3; j++) {
+//            m(i,j) = n;
+//            n++;
+//        }
+//    }
+//
+//    m(0,0) = 3;
+//    m(0,1) = 1;
+//    m(0,2) = 0;
+//    m(1,0) = 1;
+//    m(1,1) = 2;
+//    m(1,2) = 2;
+//    m(2,0) = 0;
+//    m(2,1) = 1;
+//    m(2,2) = 1;
+    
+    
     cout << "Here is the covariance matrix m:" << endl << m << endl;
     JacobiSVD<MatrixXf> svd(m, ComputeThinU | ComputeThinV);
     cout << "Its singular values are:" << endl << svd.singularValues() << endl;
     cout << "Its left singular vectors are the columns of the thin U matrix:" << endl << svd.matrixU() << endl;
-    cout << "Its right singular vectors are the columns of the thin V matrix:" << endl << svd.matrixV() << endl;
-    MatrixXf U = svd.matrixU(), V = svd.matrixV();
+    cout << "Its right singular vectors are the columns of the thin VT matrix:" << endl << svd.matrixV() << endl << endl;
+    MatrixXf U = svd.matrixU(), VT = svd.matrixV();
+    
     
     vector<vector<double>> RotMatrix(3);
     for (i = 0; i < 3; i++) RotMatrix[i].resize(3);
+    
     for (i = 0; i < 3; i++) {
         for (j = 0; j < 3; j++) {
             RotMatrix[i][j] = 0;
             for (k = 0; k < 3; k++) {
-                RotMatrix[i][j] = RotMatrix[i][j] + V(i,k) * U(j,k);
+                RotMatrix[i][j] = RotMatrix[i][j] + VT(k,i) * U(j,k);
             }
         }
     }
 
     cout << "rotation matrix:" << endl;
     printDis(RotMatrix, 3);
+    cout << endl;
+    
+    //calculate the determinant of rotation matrix
+    double det_Rot_matrix;
+    det_Rot_matrix = RotMatrix[0][0]*(RotMatrix[1][1]*RotMatrix[2][2] - RotMatrix[2][1]*RotMatrix[1][2])
+                     - RotMatrix[0][1]*(RotMatrix[1][0]*RotMatrix[2][2] - RotMatrix[2][0]*RotMatrix[1][2])
+                     + RotMatrix[0][2]*(RotMatrix[1][0]*RotMatrix[2][1] - RotMatrix[1][1]*RotMatrix[2][0]);
+    cout << "the determinant of rotation matrix is: " << det_Rot_matrix << endl << endl;
+    if (det_Rot_matrix < 0) {
+        RotMatrix[0][2] = -RotMatrix[0][2];
+        RotMatrix[1][2] = -RotMatrix[1][2];
+        RotMatrix[2][2] = -RotMatrix[2][2];
+    }
+    
     
     //4. rotate the structure from 2nd file
     
@@ -272,28 +316,44 @@ int main()
         coord_2[i][2] = RotMatrix[2][0]*coord_1[i][0]+RotMatrix[2][1]*coord_1[i][1]+RotMatrix[2][2]*coord_1[0][2];
     }
     
-    cout << "1st xyz file:" << endl;
+    cout << "1st xyz file moved to origin:" << endl;
     printCoord(coord_0, atom_num_0, atom_type_0);
-    cout << "2nd xyz file:" << endl;
+    cout << endl;
+    
+    cout << "2nd xyz file moved to origin:" << endl;
     printCoord(coord_1, atom_num_1, atom_type_1);
-    cout << "the rotated 2nd xyz file:" << endl;
+    cout << endl;
+    
+    cout << "the rotated 2nd xyz file at origin:" << endl;
     printCoord(coord_2, atom_num_1, atom_type_1);
+    cout << endl;
     
     
     
     //5. calculate RMSD again
     
     double RMSD_2 = RMSD(coord_0, coord_2, atom_num_0);
-    cout << "RMSD after rotation: " << RMSD_2 << endl;
+    cout << "RMSD after rotation: " << RMSD_2 << endl << endl;
     
     
 //    Vector3f rhs(1, 0, 0);
 //    cout << "Now consider this rhs vector:" << endl << rhs << endl;
 //    cout << "A least-squares solution of m*x = rhs is:" << endl << svd.solve(rhs) << endl;
     
+    //step5: move the rotated centroid to centroid_0
     
+    for (j = 0; j < 3; j++) {
+        for (i = 0; i < atom_num_0; i++) {
+            coord_2[i][j] = coord_2[i][j] + center_0[j];
+        }
+    }
     
+    cout << "move the rotated 2nd xyz file to centroid_0:" << endl;
+    printCoord(coord_2, atom_num_1, atom_type_1);
+    cout << endl;
     
+    cout << "the original 1st xyz file:" << endl;
+    printCoord(coord_0_original, atom_num_0, atom_type_0);
 
 //    //print out the reorganized coordinates from 2nd file in a 3rd file
 //
