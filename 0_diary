@@ -1,8 +1,16 @@
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+16.09.2020
+
+    use Eigen to solve SVD and construct rotation matrix, works in a rough way
+        works perfectly when superimposing plane triangles, works terriblely when adding dimension to tetrahedral
+        seems weirdly squash 3D object onto plane....
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
 14.09.2020
 
     modified code from "https://github.com/willhooper/superpose/blob/master/src/superimposer.cpp" works
         root-mean-square deviation (RMSD) decreases from 5.50286232 to 0.18417864 for example aspirin input
+        not ideal for the 2 input molecules with exact same geometry
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 09-10.09.2020
