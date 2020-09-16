@@ -45,7 +45,7 @@ int main()
     fout << fixed;
     
     
-    fin.open("test1_1.xyz");                                         //open the 1st xyz file and test whether it work2
+    fin.open("aspirin_1.xyz");                                         //open the 1st xyz file and test whether it work2
     if(fin.fail())
         cout << "File failed to open." << endl;
 
@@ -78,7 +78,7 @@ int main()
     fin.close();
     
     
-    fin.open("test1_2.xyz");                                         //open the 2nd xyz file and test whether it works
+    fin.open("aspirin_3.xyz");                                         //open the 2nd xyz file and test whether it works
     if(fin.fail())
         cout << "File failed to open." << endl;
         
@@ -123,6 +123,7 @@ int main()
             coord_1[i][j] = coord_1[i][j] - center_1[j];
         }
     }
+    
     
     
     //step3: calculate the relative atom-atom distances, reorder 2nd file
@@ -256,24 +257,23 @@ int main()
 //        }
 //    }
 //
-//    m(0,0) = 3;
+//    m(0,0) = 1;
 //    m(0,1) = 1;
 //    m(0,2) = 0;
-//    m(1,0) = 1;
-//    m(1,1) = 2;
-//    m(1,2) = 2;
-//    m(2,0) = 0;
-//    m(2,1) = 1;
+//    m(1,0) = 0;
+//    m(1,1) = 1;
+//    m(1,2) = 1;
+//    m(2,0) = 1;
+//    m(2,1) = 0;
 //    m(2,2) = 1;
     
     
     cout << "Here is the covariance matrix m:" << endl << m << endl;
-    JacobiSVD<MatrixXf> svd(m, ComputeThinU | ComputeThinV);
+    JacobiSVD<MatrixXf> svd(m, ComputeFullU | ComputeFullV);
     cout << "Its singular values are:" << endl << svd.singularValues() << endl;
     cout << "Its left singular vectors are the columns of the thin U matrix:" << endl << svd.matrixU() << endl;
-    cout << "Its right singular vectors are the columns of the thin VT matrix:" << endl << svd.matrixV() << endl << endl;
-    MatrixXf U = svd.matrixU(), VT = svd.matrixV();
-    
+    cout << "Its right singular vectors are the columns of the thin V matrix:" << endl << svd.matrixV() << endl << endl;
+    MatrixXf U = svd.matrixU(), V = svd.matrixV(), S = svd.singularValues();
     
     vector<vector<double>> RotMatrix(3);
     for (i = 0; i < 3; i++) RotMatrix[i].resize(3);
@@ -282,7 +282,7 @@ int main()
         for (j = 0; j < 3; j++) {
             RotMatrix[i][j] = 0;
             for (k = 0; k < 3; k++) {
-                RotMatrix[i][j] = RotMatrix[i][j] + VT(k,i) * U(j,k);
+                RotMatrix[i][j] = RotMatrix[i][j] + V(k,i) * U(j,k);
             }
         }
     }
@@ -293,7 +293,7 @@ int main()
     
     //calculate the determinant of rotation matrix
     double det_Rot_matrix;
-    det_Rot_matrix = RotMatrix[0][0]*(RotMatrix[1][1]*RotMatrix[2][2] - RotMatrix[2][1]*RotMatrix[1][2])
+    det_Rot_matrix =   RotMatrix[0][0]*(RotMatrix[1][1]*RotMatrix[2][2] - RotMatrix[2][1]*RotMatrix[1][2])
                      - RotMatrix[0][1]*(RotMatrix[1][0]*RotMatrix[2][2] - RotMatrix[2][0]*RotMatrix[1][2])
                      + RotMatrix[0][2]*(RotMatrix[1][0]*RotMatrix[2][1] - RotMatrix[1][1]*RotMatrix[2][0]);
     cout << "the determinant of rotation matrix is: " << det_Rot_matrix << endl << endl;
@@ -311,9 +311,9 @@ int main()
         coord_2[i].resize(3);
     
     for (i = 0; i < atom_num_1; i++) {
-        coord_2[i][0] = RotMatrix[0][0]*coord_1[i][0]+RotMatrix[0][1]*coord_1[i][1]+RotMatrix[0][2]*coord_1[0][2];
-        coord_2[i][1] = RotMatrix[1][0]*coord_1[i][0]+RotMatrix[1][1]*coord_1[i][1]+RotMatrix[1][2]*coord_1[0][2];
-        coord_2[i][2] = RotMatrix[2][0]*coord_1[i][0]+RotMatrix[2][1]*coord_1[i][1]+RotMatrix[2][2]*coord_1[0][2];
+        coord_2[i][0] = RotMatrix[0][0]*coord_1[i][0] + RotMatrix[0][1]*coord_1[i][1] + RotMatrix[0][2]*coord_1[i][2];
+        coord_2[i][1] = RotMatrix[1][0]*coord_1[i][0] + RotMatrix[1][1]*coord_1[i][1] + RotMatrix[1][2]*coord_1[i][2];
+        coord_2[i][2] = RotMatrix[2][0]*coord_1[i][0] + RotMatrix[2][1]*coord_1[i][1] + RotMatrix[2][2]*coord_1[i][2];
     }
     
     cout << "1st xyz file moved to origin:" << endl;
