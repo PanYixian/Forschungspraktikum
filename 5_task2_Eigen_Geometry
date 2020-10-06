@@ -1,0 +1,226 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <cmath>
+#include <Eigen/Geometry>
+using namespace std;
+using namespace Eigen;
+
+ 
+int main()
+{
+    
+    // step1: read in the coordinates
+    
+    ifstream fin;
+    ofstream fout;
+    int atom_num_0, atom_num_1;
+    int i,j,k;
+    cin.precision(8);
+    cout.precision(8);
+    fin.precision(8);
+    fout.precision(8);
+    cout << fixed;
+    fout << fixed;
+    
+    fin.open("aspirin_1.xyz");
+    if (fin.fail())
+        cout << "File failed to open." << endl;
+    
+    fin >> atom_num_0;
+    Matrix3Xd coord_0(3, atom_num_0);
+    string atom_type_0[atom_num_0];
+    
+    // coordinate stored in column, 3*d matrix
+    
+    for (i = 0; i < atom_num_0; i++) {
+        fin >> atom_type_0[i];
+        for (j = 0; j < 3; j++) {
+            fin >> coord_0(j,i);
+        }
+    }
+    fin.close();
+    
+    fin.open("aspirin_3.xyz");
+    if (fin.fail())
+        cout << "File failed to open." << endl;
+    
+    fin >> atom_num_1;
+    Matrix3Xd coord_1(3, atom_num_1);
+    string atom_type_1[atom_num_1];
+    
+    for (i = 0; i < atom_num_1; i++) {
+        fin >> atom_type_1[i];
+        for (j = 0; j < 3; j++) {
+            fin >> coord_1(j, i);
+        }
+    }
+    fin.close();
+    
+    cout << coord_0.transpose() << endl << endl;
+    cout << coord_1.transpose() << endl << endl;
+    
+    double RMSD_before_trans = 0;
+    
+    for (int i = 0; i < atom_num_0; i++) {
+        for (int j = 0; j < 3; j++) {
+            RMSD_before_trans += pow(coord_0(j,i)-coord_1(j,i), 2);
+        }
+    }
+    
+    RMSD_before_trans = sqrt(RMSD_before_trans / atom_num_0);
+    
+    cout << "RMSD before translation: " << RMSD_before_trans << endl << endl;
+    
+    // step2: calculate the centroids and translate to origin
+    
+    Vector3d centroid_0 = Vector3d::Zero(), centroid_1 = Vector3d::Zero();
+    
+    for (i = 0; i < 3; i++) {
+        double sum_0 = 0, sum_1 = 0;
+        for (j = 0; j < atom_num_0; j++) {
+            sum_0 = sum_0 + coord_0(i, j);
+            sum_1 = sum_1 + coord_1(i, j);
+        }
+        centroid_0(i) = sum_0 / atom_num_0;
+        centroid_1(i) = sum_1 / atom_num_1;
+    }
+    
+    cout << "centroid of 1st file: " << endl << centroid_0 << endl;
+    cout << "centroid of 2nd file: " << endl << centroid_1 << endl;
+    cout << endl;
+    
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < atom_num_0;  j++) {
+            coord_0(i,j) -= centroid_0(i);
+            coord_1(i,j) -= centroid_1(i);
+        }
+    }
+    
+    
+    // step3: calculate the relative atom-atom distances, reorder 2nd file
+    
+    //build two matrices for storing the characteristic relative atom-atom distances
+    
+    MatrixXd rel_dis_0(atom_num_0, atom_num_0), rel_dis_1(atom_num_1, atom_num_1);
+    
+    // calculate and sort the relative distances for each atom from 1st file
+    
+    for (i = 0; i < atom_num_0; i++) {
+        
+        for (j = 0; j < atom_num_0; j++) {
+            
+            rel_dis_0(i,j) = sqrt(pow((coord_0(0,i)-coord_0(0,j)), 2) +
+                                  pow((coord_0(1,i)-coord_0(1,j)), 2) +
+                                  pow((coord_0(2,i)-coord_0(2,j)), 2));
+            
+            rel_dis_1(i,j) = sqrt(pow((coord_1(0,i)-coord_1(0,j)), 2) +
+                                  pow((coord_1(1,i)-coord_1(1,j)), 2) +
+                                  pow((coord_1(2,i)-coord_1(2,j)), 2));
+        }
+        
+        for (j = 0; j < atom_num_0; j++) {
+            for (k = j + 1; k < atom_num_0; k++) {
+                
+                if (rel_dis_0(i,j) > rel_dis_0(i,k))
+                    swap(rel_dis_0(i,j), rel_dis_0(i,k));
+                if (rel_dis_1(i,j) > rel_dis_1(i,k))
+                    swap(rel_dis_1(i,j), rel_dis_1(i,k));
+                
+            }
+        }
+    }
+    
+    // compare the relative distances and switch the atom order in 2nd file
+    
+    for (i = 0; i < atom_num_0; i++) {
+            
+        double min_dev = 10000;
+        double dev_sum = 0;
+            
+        for (j = i; j < atom_num_0; j++) {
+            dev_sum = 0;
+            for (k = 0; k < atom_num_0; k++) {
+                dev_sum = dev_sum + abs(rel_dis_0(i,k) - rel_dis_1(j,k));
+            }
+                
+    //            cout << i << " " << j << " " << dev_sum << " " << min_dev << endl;
+                    
+            if (dev_sum < min_dev) {
+                
+                for (k = 0; k < atom_num_0; k++)
+                    swap(rel_dis_1(i,k), rel_dis_1(j,k));
+                
+                for (k = 0; k < 3; k++)
+                    swap(coord_1(k,i), coord_1(k,j));
+                
+                string temp = atom_type_1[i];
+                atom_type_1[i] = atom_type_1[j];
+                atom_type_1[j] = temp;
+                
+                min_dev = dev_sum;
+                
+    //                printCoord(coord_1, atom_num_1, atom_type_1);
+            }
+    //            cout << min_dev << endl;
+        }
+    }
+    
+    cout << coord_0.transpose() << endl << endl;
+    cout << coord_1.transpose() << endl << endl;
+    
+    
+    // step4: apply Kabsch Algorithm
+    // 4-1: compute RMSD(coord_0, coord_1)
+    
+    double RMSD_before = 0;
+    
+    for (int i = 0; i < atom_num_0; i++) {
+        for (int j = 0; j < 3; j++) {
+            RMSD_before += pow(coord_0(j,i)-coord_1(j,i), 2);
+        }
+    }
+    
+    RMSD_before = sqrt(RMSD_before / atom_num_0);
+    
+    cout << "RMSD before rotation: " << RMSD_before << endl << endl;
+    
+    // 4-2: SVD
+    MatrixXd CovMatrix = coord_1 * coord_0.transpose();
+    JacobiSVD<MatrixXd> SVD(CovMatrix, ComputeThinU | ComputeThinV);
+    
+    // 4-3: find the rotation matrix
+    double d = (SVD.matrixV() * SVD.matrixU().transpose()).determinant();
+    if (d > 0)
+        d = 1.0;
+    else
+        d = -1.0;
+    Matrix3d I = Matrix3d::Identity(3, 3);
+    I(2, 2) = d;
+    Matrix3d RotMatrix = SVD.matrixV() * I * SVD.matrixU().transpose();
+    
+//    cout << (RotMatrix * coord_1).transpose() << endl;
+    
+    // 4-4: rotate the 2nd molecule and calculate the RMSD again
+    
+    Matrix3Xd coord_2(3, atom_num_1);
+    coord_2 = RotMatrix * coord_1;
+    
+    cout << coord_0.transpose() << endl << endl;
+    cout << coord_2.transpose() << endl << endl;
+    
+    double RMSD_after = 0;
+    
+    for (int i = 0; i < atom_num_0; i++) {
+        for (int j = 0; j < 3; j++) {
+            RMSD_after += pow(coord_0(j,i)-coord_2(j,i), 2);
+        }
+    }
+    
+    RMSD_after = sqrt(RMSD_after / atom_num_0);
+    
+    cout << "RMSD after rotation: " << RMSD_after << endl << endl;
+    
+
+    return 0;
+}
