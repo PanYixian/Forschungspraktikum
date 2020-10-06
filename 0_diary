@@ -1,10 +1,18 @@
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+06.10.2020
+
+    modified code from "https://github.com/oleg-alexandrov/projects/blob/master/eigen/Kabsch.cpp"
+        a bit of amazed by the use of external library Eigen: how it has simplified the code (matrix representation, multiplication etc.)
+        but roughly sense that heavy use of Eigen slows down the program, is it true?
+    
+    combine the code above with my own
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 05.10.2020
 
     principle of Kabsch Algorithm
-
-
+    
+    modify the code from "https://github.com/oleg-alexandrov/projects/blob/master/eigen/Kabsch.cpp"
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 16.09.2020
