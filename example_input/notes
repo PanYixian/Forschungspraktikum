@@ -1,0 +1,5 @@
+aspirin_1: reference coordinate
+
+aspirin_2: translated and rotated from aspirin_1 with different order of atoms
+
+aspirin_3: distorted from aspirin_2
