@@ -1,4 +1,12 @@
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+07.10.2020
+
+    code using Eigen works fine for both task2 and task3
+        run more tests with different molecules and larger distortion
+
+    regarding task4: is it possible to locate the "backbone" of two molecules and apply Kabsch Algorithm only to the "backbone(with same number of atoms)"?
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
 06.10.2020
 
     modified code from "https://github.com/oleg-alexandrov/projects/blob/master/eigen/Kabsch.cpp"
