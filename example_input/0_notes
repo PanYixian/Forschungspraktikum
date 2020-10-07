@@ -1,0 +1,17 @@
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+aspirin_1.xyz: reference coordinate
+
+aspirin_2.xyz: translated and rotated from aspirin_1 with different order of atoms
+
+aspirin_3.xyz: slightly distorted from aspirin_2
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+pent_A_center_R_1.xyz: reference coordinate
+
+pent_A_center_R_2.xyz: translated and rotated from pent_A_center_R_1 with different order of atoms
+
+pent_A_center_R_3.xyz: slightly distorted from pent_A_center_R_2
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
