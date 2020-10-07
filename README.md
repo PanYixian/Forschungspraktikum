@@ -22,3 +22,10 @@ MOLFIT: A computer program for molecular superposition (P.K.Redington, Computers
 - SS algorithm: use first and second derivatives to determine minimum (possible problem of convergence)
 - BFGS algorithm: Euler rotation matrix
 - !!! initialization: align the first three vectors(atoms)? may save some later calculations?
+
+paper2:
+Computational methods for the structural alignment of molecules (C. Lemmen & T. Lengauer, Journal of Computer-Aided Molecular Design, 14: 215–232, 2000.)
+- matching-based: Boltzmann-machine
+- optimization-based: simplex optimization of the molecular electrostatic fields, Hodgkin similarity index
+- grid-based: electron density overlap optimization using Fourier space methods, electron den- sity approximated by sets of Gaussian functions
+- graph-based: clique detection, distance compatibility graph
