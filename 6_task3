@@ -27,7 +27,7 @@ int main()
     cout << fixed;
     fout << fixed;
     
-    fin.open("aspirin_1.xyz");
+    fin.open("pent_A_center_R_1.xyz");
     if (fin.fail())
         cout << "File failed to open." << endl;
     
@@ -45,7 +45,7 @@ int main()
     }
     fin.close();
     
-    fin.open("aspirin_3.xyz");
+    fin.open("pent_A_center_R_3.xyz");
     if (fin.fail())
         cout << "File failed to open." << endl;
     
@@ -61,8 +61,31 @@ int main()
     }
     fin.close();
     
-    cout << coord_0.transpose() << endl << endl;
-    cout << coord_1.transpose() << endl << endl;
+    // print out original coordinates
+    
+    cout << "the origianl reference coordinate: " << endl << endl;
+    
+    for (i = 0; i < atom_num_0; i++) {
+        cout << atom_type_0[i] << " ";
+        for (j = 0; j < 3; j++) {
+            cout << coord_0(j,i) << " ";
+        }
+        cout << endl;
+    }
+    cout << endl;
+    
+    cout << "the origianl working coordinate: " << endl << endl;
+    
+    for (i = 0; i < atom_num_0; i++) {
+        cout << atom_type_1[i] << " ";
+        for (j = 0; j < 3; j++) {
+            cout << coord_1(j,i) << " ";
+        }
+        cout << endl;
+    }
+    cout << endl;
+    
+    // calculate the RMSD of original coordinates
     
     double RMSD_before_trans = 0;
     
@@ -75,6 +98,8 @@ int main()
     RMSD_before_trans = sqrt(RMSD_before_trans / atom_num_0);
     
     cout << "RMSD before translation: " << RMSD_before_trans << endl << endl;
+    
+    
     
     // step2: calculate the centroids and translate to origin
     
@@ -90,9 +115,9 @@ int main()
         centroid_1(i) = sum_1 / atom_num_1;
     }
     
-    cout << "centroid of 1st file: " << endl << centroid_0 << endl;
-    cout << "centroid of 2nd file: " << endl << centroid_1 << endl;
-    cout << endl;
+//    cout << "centroid of 1st file: " << endl << centroid_0 << endl;
+//    cout << "centroid of 2nd file: " << endl << centroid_1 << endl;
+//    cout << endl;
     
     for (i = 0; i < 3; i++) {
         for (j = 0; j < atom_num_0;  j++) {
@@ -100,6 +125,7 @@ int main()
             coord_1(i,j) -= centroid_1(i);
         }
     }
+    
     
     
     // step3: calculate the relative atom-atom distances, reorder 2nd file
@@ -163,15 +189,32 @@ int main()
                 atom_type_1[j] = temp;
                 
                 min_dev = dev_sum;
-                
-    //                printCoord(coord_1, atom_num_1, atom_type_1);
             }
     //            cout << min_dev << endl;
         }
     }
     
-    cout << coord_0.transpose() << endl << endl;
-    cout << coord_1.transpose() << endl << endl;
+    cout << "the reference coordinate after translating centroid to origin:" << endl << endl;
+    
+    for (i = 0; i < atom_num_0; i++) {
+        cout << atom_type_0[i] << " ";
+        for (j = 0; j < 3; j++) {
+            cout << coord_0(j,i) << " ";
+        }
+        cout << endl;
+    }
+    cout << endl;
+    
+    cout << "the working coordinate after translating centroid to origin:" << endl << endl;
+    
+    for (i = 0; i < atom_num_0; i++) {
+        cout << atom_type_1[i] << " ";
+        for (j = 0; j < 3; j++) {
+            cout << coord_1(j,i) << " ";
+        }
+        cout << endl;
+    }
+    cout << endl;
     
     
     // step4: apply Kabsch Algorithm
@@ -187,7 +230,7 @@ int main()
     
     RMSD_before = sqrt(RMSD_before / atom_num_0);
     
-    cout << "RMSD before rotation: " << RMSD_before << endl << endl;
+    cout << "RMSD after translation and before rotation: " << RMSD_before << endl << endl;
     
     // 4-2: SVD
     MatrixXd CovMatrix = coord_1 * coord_0.transpose();
@@ -210,8 +253,31 @@ int main()
     Matrix3Xd coord_2(3, atom_num_1);
     coord_2 = RotMatrix * coord_1;
     
-    cout << coord_0.transpose() << endl << endl;
-    cout << coord_2.transpose() << endl << endl;
+//    cout << coord_0.transpose() << endl << endl;
+//    cout << coord_2.transpose() << endl << endl;
+    
+    
+    cout << "the reference coordinate with centroid at origin:" << endl << endl;
+    
+    for (i = 0; i < atom_num_0; i++) {
+        cout << atom_type_0[i] << " ";
+        for (j = 0; j < 3; j++) {
+            cout << coord_0(j,i) << " ";
+        }
+        cout << endl;
+    }
+    cout << endl;
+    
+    cout << "the working coordinate with centroid at origin after rotation:" << endl << endl;
+    
+    for (i = 0; i < atom_num_0; i++) {
+        cout << atom_type_1[i] << " ";
+        for (j = 0; j < 3; j++) {
+            cout << coord_2(j,i) << " ";
+        }
+        cout << endl;
+    }
+    cout << endl;
     
     double RMSD_after = 0;
     
@@ -228,3 +294,4 @@ int main()
 
     return 0;
 }
+
