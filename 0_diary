@@ -1,10 +1,45 @@
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+12.10.2020
+
+    code using Eigen works fine for task2, task3 and task4:
+        need to do: test task4 with larger distortion till it doesnot work anymore
+    
+    8_task_5_special_atom: 1st idea for task5: 
+        suppose that there are two special atoms which are not C,H,O
+        find out the two special atoms and centroids, move centroids to origin
+        apply Kabsch Algorithm to these point sets of three and construct rotation matrix
+        apply the rotation to working coordination
+        (no reordering of atoms)
+        the code works, but the problem it solves is too narrow and specific
+        
+    2nd idea for task5:
+        the molecules are with different number of atoms 
+        (assuming that reference is with less atom)
+        the size of the matrix rel_dis (not comparable)
+        in order to reorder the atoms by comparing rel_dis matrix, find a maximal rel_dis in reference
+        construct rel_dis matrix, augment the rel_dis matrix by filling the blank with the maximal rel_dis
+        same procedure as in task2/3/4
+        
+    Reflection: the major problem is always how to create "fingerprint" for each atom so that they can be identifiable
+        the solution so far is atom-atom relative distance, which is not suitable anymore for input with different number of atoms
+        new idea for differentiating atoms: cutoff radius, identifying only the local environment of atoms and make it the "fingerprint"
+    
+    3rd idea for task5: cutoff radius
+        (graph theory)
+        set the cutoff radius to be 1.5 times of C-C bond: 2.3 angstrom
+        
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
 07.10.2020
 
     code using Eigen works fine for both task2 and task3
-        run more tests with different molecules and larger distortion
+        (run more tests with different molecules and larger distortion)
+        1: read in reference and working coordinates, calculate centroids
+        2: translate centroids to origin
+        3: calculate the relative atom-atom distances rel_dis matrix, reorder 2nd file by finding the rel_dis vector with least deviation
+        4: apply Kabsch algorithm, construct rotation matrix
+        5: move the rotated centroid to centroid_0
 
-    regarding task4: is it possible to locate the "backbone" of two molecules and apply Kabsch Algorithm only to the "backbone(with same number of atoms)"?
+    regarding task5: is it possible to locate the "backbone" of two molecules and apply Kabsch Algorithm only to the "backbone(with same number of atoms)"?
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 06.10.2020
