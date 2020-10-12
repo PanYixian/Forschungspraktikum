@@ -1,5 +1,6 @@
 // use external library Eigen
-// works for both task2 and task3
+// works for task2, task3 and task4
+// same molecule, different atom order, translation and rotation, with distortion of geometry
 
 
 #include <iostream>
