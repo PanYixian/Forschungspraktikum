@@ -3,6 +3,7 @@
 // 1st idea: suppose that there are two special atoms which are not C,H,O
 //           find out the two special atoms and centroids, apply Kabsch Algorithm to this point set of three
 
+// the code works, but the situation it deals with is too specific concerning the special atoms
 
 #include <iostream>
 #include <fstream>
@@ -33,12 +34,20 @@ int main()
         cout << "File failed to open." << endl;
     
     fin >> atom_num_0;
-    Matrix3Xd coord_0(3, atom_num_0), ref_coord(3, 3);
+    Matrix3Xd coord_0(3, atom_num_0), ref_coord(3, 3), work_coord(3, 3);
                                     // ref_coord(i, 0) is the 1st special atom
                                     // ref_coord(i, 1) is the 2nd special atom
                                     // ref_coord(i, 2) is the centroid
     string atom_type_0[atom_num_0], ref_coord_type[2];
     int count_special = 0;
+    
+    
+    // the 3rd columns of ref_coord and work_coord are set to be at origin (0,0,0)
+    for (k = 0; k < 3; k++) {
+        ref_coord(k, 2) = 0;
+        work_coord (k, 2) = 0;
+        
+    }
     
     // coordinate stored in column, 3*d matrix
     
@@ -60,22 +69,31 @@ int main()
     }
     fin.close();
     
-    fin.open("pent_A_center_R_3.xyz");
+    fin.open("pent_A_center_R_CH3.xyz");
     if (fin.fail())
         cout << "File failed to open." << endl;
     
     fin >> atom_num_1;
-    Matrix3Xd coord_1(3, atom_num_1), work_coord(3, 3);
+    Matrix3Xd coord_1(3, atom_num_1);
     string atom_type_1[atom_num_1];
     
     for (i = 0; i < atom_num_1; i++) {
         fin >> atom_type_1[i];
         
-        // find out the special atom by comparing with the one found in reference coord
-        
-        
         for (j = 0; j < 3; j++) {
             fin >> coord_1(j, i);
+        }
+        
+        // find out the special atom by comparing with the one found in reference coord
+        if (atom_type_1[i] == ref_coord_type[0]){
+            work_coord(0, 0) = coord_1(0, i);
+            work_coord(1, 0) = coord_1(1, i);
+            work_coord(2, 0) = coord_1(2, i);
+        }
+        if (atom_type_1[i] == ref_coord_type[1]){
+            work_coord(0, 1) = coord_1(0, i);
+            work_coord(1, 1) = coord_1(1, i);
+            work_coord(2, 1) = coord_1(2, i);
         }
     }
     fin.close();
@@ -87,7 +105,7 @@ int main()
     for (i = 0; i < atom_num_0; i++) {
         cout << atom_type_0[i] << " ";
         for (j = 0; j < 3; j++) {
-            cout << coord_0(j,i) << " ";
+            cout << coord_0(j, i) << " ";
         }
         cout << endl;
     }
@@ -95,10 +113,10 @@ int main()
     
     cout << "the origianl working coordinate: " << endl << endl;
     
-    for (i = 0; i < atom_num_0; i++) {
+    for (i = 0; i < atom_num_1; i++) {
         cout << atom_type_1[i] << " ";
         for (j = 0; j < 3; j++) {
-            cout << coord_1(j,i) << " ";
+            cout << coord_1(j, i) << " ";
         }
         cout << endl;
     }
@@ -110,7 +128,7 @@ int main()
     
     for (int i = 0; i < atom_num_0; i++) {
         for (int j = 0; j < 3; j++) {
-            RMSD_before_trans += pow(coord_0(j,i)-coord_1(j,i), 2);
+            RMSD_before_trans += pow(coord_0(j, i)-coord_1(j, i), 2);
         }
     }
     
@@ -125,12 +143,19 @@ int main()
     Vector3d centroid_0 = Vector3d::Zero(), centroid_1 = Vector3d::Zero();
     
     for (i = 0; i < 3; i++) {
-        double sum_0 = 0, sum_1 = 0;
+        double sum_0 = 0;
         for (j = 0; j < atom_num_0; j++) {
             sum_0 = sum_0 + coord_0(i, j);
-            sum_1 = sum_1 + coord_1(i, j);
         }
         centroid_0(i) = sum_0 / atom_num_0;
+        
+    }
+    
+    for (i = 0; i < 3; i++) {
+        double sum_1 = 0;
+        for (j = 0; j < atom_num_1; j++) {
+            sum_1 = sum_1 + coord_1(i, j);
+        }
         centroid_1(i) = sum_1 / atom_num_1;
     }
     
@@ -139,101 +164,24 @@ int main()
 //    cout << endl;
     
     for (i = 0; i < 3; i++) {
-        for (j = 0; j < atom_num_0;  j++) {
-            coord_0(i,j) -= centroid_0(i);
-            coord_1(i,j) -= centroid_1(i);
-        }
-    }
-    
-    
-    
-    // step3: calculate the relative atom-atom distances, reorder 2nd file
-    
-    //build two matrices for storing the characteristic relative atom-atom distances
-    
-    MatrixXd rel_dis_0(atom_num_0, atom_num_0), rel_dis_1(atom_num_1, atom_num_1);
-    
-    // calculate and sort the relative distances for each atom from 1st file
-    
-    for (i = 0; i < atom_num_0; i++) {
-        
         for (j = 0; j < atom_num_0; j++) {
-            
-            rel_dis_0(i,j) = sqrt(pow((coord_0(0,i)-coord_0(0,j)), 2) +
-                                  pow((coord_0(1,i)-coord_0(1,j)), 2) +
-                                  pow((coord_0(2,i)-coord_0(2,j)), 2));
-            
-            rel_dis_1(i,j) = sqrt(pow((coord_1(0,i)-coord_1(0,j)), 2) +
-                                  pow((coord_1(1,i)-coord_1(1,j)), 2) +
-                                  pow((coord_1(2,i)-coord_1(2,j)), 2));
+            coord_0(i, j) -= centroid_0(i);
         }
-        
-        for (j = 0; j < atom_num_0; j++) {
-            for (k = j + 1; k < atom_num_0; k++) {
-                
-                if (rel_dis_0(i,j) > rel_dis_0(i,k))
-                    swap(rel_dis_0(i,j), rel_dis_0(i,k));
-                if (rel_dis_1(i,j) > rel_dis_1(i,k))
-                    swap(rel_dis_1(i,j), rel_dis_1(i,k));
-                
-            }
+        ref_coord(i, 0) -= centroid_0(i);
+        ref_coord(i, 1) -= centroid_0(i);
+        work_coord(i, 0) -= centroid_1(i);
+        work_coord(i, 1) -= centroid_1(i);
+    }
+    
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < atom_num_1; j++) {
+            coord_1(i, j) -= centroid_1(i);
         }
     }
     
-    // compare the relative distances and switch the atom order in 2nd file
+    cout << "reference coordinate for constructing CovMatrix: " << endl << ref_coord << endl;
+    cout << "working coordinate for constructing CovMatrix: " << endl << work_coord << endl;
     
-    for (i = 0; i < atom_num_0; i++) {
-            
-        double min_dev = 10000;
-        double dev_sum = 0;
-            
-        for (j = i; j < atom_num_0; j++) {
-            dev_sum = 0;
-            for (k = 0; k < atom_num_0; k++) {
-                dev_sum = dev_sum + abs(rel_dis_0(i,k) - rel_dis_1(j,k));
-            }
-                
-    //            cout << i << " " << j << " " << dev_sum << " " << min_dev << endl;
-                    
-            if (dev_sum < min_dev) {
-                
-                for (k = 0; k < atom_num_0; k++)
-                    swap(rel_dis_1(i,k), rel_dis_1(j,k));
-                
-                for (k = 0; k < 3; k++)
-                    swap(coord_1(k,i), coord_1(k,j));
-                
-                string temp = atom_type_1[i];
-                atom_type_1[i] = atom_type_1[j];
-                atom_type_1[j] = temp;
-                
-                min_dev = dev_sum;
-            }
-    //            cout << min_dev << endl;
-        }
-    }
-    
-    cout << "the reference coordinate after translating centroid to origin:" << endl << endl;
-    
-    for (i = 0; i < atom_num_0; i++) {
-        cout << atom_type_0[i] << " ";
-        for (j = 0; j < 3; j++) {
-            cout << coord_0(j,i) << " ";
-        }
-        cout << endl;
-    }
-    cout << endl;
-    
-    cout << "the working coordinate after translating centroid to origin:" << endl << endl;
-    
-    for (i = 0; i < atom_num_0; i++) {
-        cout << atom_type_1[i] << " ";
-        for (j = 0; j < 3; j++) {
-            cout << coord_1(j,i) << " ";
-        }
-        cout << endl;
-    }
-    cout << endl;
     
     
     // step4: apply Kabsch Algorithm
@@ -243,7 +191,7 @@ int main()
     
     for (int i = 0; i < atom_num_0; i++) {
         for (int j = 0; j < 3; j++) {
-            RMSD_before += pow(coord_0(j,i)-coord_1(j,i), 2);
+            RMSD_before += pow(coord_0(j, i)-coord_1(j, i), 2);
         }
     }
     
@@ -252,7 +200,7 @@ int main()
     cout << "RMSD after translation and before rotation: " << RMSD_before << endl << endl;
     
     // 4-2: SVD
-    MatrixXd CovMatrix = coord_1 * coord_0.transpose();
+    MatrixXd CovMatrix = work_coord * ref_coord.transpose();
     JacobiSVD<MatrixXd> SVD(CovMatrix, ComputeThinU | ComputeThinV);
     
     // 4-3: find the rotation matrix
@@ -264,6 +212,7 @@ int main()
     Matrix3d I = Matrix3d::Identity(3, 3);
     I(2, 2) = d;
     Matrix3d RotMatrix = SVD.matrixV() * I * SVD.matrixU().transpose();
+    cout << "Rotation matrix: " << endl << RotMatrix << endl;
     
 //    cout << (RotMatrix * coord_1).transpose() << endl;
     
@@ -281,7 +230,7 @@ int main()
     for (i = 0; i < atom_num_0; i++) {
         cout << atom_type_0[i] << " ";
         for (j = 0; j < 3; j++) {
-            cout << coord_0(j,i) << " ";
+            cout << coord_0(j, i) << " ";
         }
         cout << endl;
     }
@@ -289,10 +238,10 @@ int main()
     
     cout << "the working coordinate with centroid at origin after rotation:" << endl << endl;
     
-    for (i = 0; i < atom_num_0; i++) {
+    for (i = 0; i < atom_num_1; i++) {
         cout << atom_type_1[i] << " ";
         for (j = 0; j < 3; j++) {
-            cout << coord_2(j,i) << " ";
+            cout << coord_2(j, i) << " ";
         }
         cout << endl;
     }
@@ -302,7 +251,7 @@ int main()
     
     for (int i = 0; i < atom_num_0; i++) {
         for (int j = 0; j < 3; j++) {
-            RMSD_after += pow(coord_0(j,i)-coord_2(j,i), 2);
+            RMSD_after += pow(coord_0(j, i)-coord_2(j, i), 2);
         }
     }
     
