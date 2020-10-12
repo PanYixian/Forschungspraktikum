@@ -17,7 +17,7 @@
         (assuming that reference is with less atom)
         the size of the matrix rel_dis (not comparable)
         in order to reorder the atoms by comparing rel_dis matrix, find a maximal rel_dis in reference
-        construct rel_dis matrix, augment the rel_dis matrix by filling the blank with the maximal rel_dis
+        construct rel_dis matrix, augment the smaller rel_dis matrix by filling the blank with the maximal rel_dis
         same procedure as in task2/3/4
         
     Reflection: the major problem is always how to create "fingerprint" for each atom so that they can be identifiable
