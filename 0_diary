@@ -1,4 +1,12 @@
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+13.10.2020
+
+    7_task4_Eigen: 
+        tried distorted molecule without chemistry sense, code still did the superimpose, though in a rough way (the algorithm is amazing....)
+    
+        realize 3rd idea for task5 using graph theory
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
 12.10.2020
 
     code using Eigen works fine for task2, task3 and task4:
@@ -11,14 +19,18 @@
         apply the rotation to working coordination
         (no reordering of atoms)
         the code works, but the problem it solves is too narrow and specific
-        
-    2nd idea for task5:
+    
+    8_task5_filling_max_rel_dis: 2nd idea for task5
         the molecules are with different number of atoms 
         (assuming that reference is with less atom)
-        the size of the matrix rel_dis (not comparable)
+        different size of the matrix rel_dis (not comparable)
         in order to reorder the atoms by comparing rel_dis matrix, find a maximal rel_dis in reference
         construct rel_dis matrix, augment the smaller rel_dis matrix by filling the blank with the maximal rel_dis
         same procedure as in task2/3/4
+        
+        the code works, but imperfectly
+        reordering of the atoms in working coord might be only working for the first few atoms (n < 10), apply Kabsch to fewer atoms ??
+        applying Kabsch with fewer atoms gives worse result
         
     Reflection: the major problem is always how to create "fingerprint" for each atom so that they can be identifiable
         the solution so far is atom-atom relative distance, which is not suitable anymore for input with different number of atoms
