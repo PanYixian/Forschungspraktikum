@@ -2,7 +2,8 @@
 
 // 3rd idea for task5:
 //      use the local environment of atoms as "fingerprint"
-//      collect only the relative distances smaller than cutoff_radius in the rel_dis matrix
+//      collect only the relative distances smaller than cutoff_radius in the rel_dis matrix, fill the blank with a large max_rel_dis
+//      compare the rel_dis matrix and sort the atoms 
 
 #include <iostream>
 #include <fstream>
