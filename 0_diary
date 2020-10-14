@@ -1,4 +1,14 @@
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+14.10.2020
+    
+    8_task5_cutoff_radius: 3rd idea for task5:
+        use the local environment of atoms as "fingerprint"
+        collect only the relative distances smaller than cutoff_radius in the rel_dis matrix, fill the blank with a large max_rel_dis
+        compare the rel_dis matrix and sort the atoms 
+        
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
 13.10.2020
 
     7_task4_Eigen: 
