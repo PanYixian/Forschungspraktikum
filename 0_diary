@@ -1,4 +1,16 @@
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+15.10.2020
+
+    8_task5_cutoff_radius: 3rd idea for task5:
+        add angular information for each atom
+            calculate cosine of the angles of each atom (as origin) expanded with the neighbors within cutoff_radius
+        
+        one problem about the sorting in my code:
+            compare working with reference and calculate the deviations, find out the minimal deviation and switch the order
+            is it possible that this atom from working has a smaller deviation with another atom in reference? 
+            but this atom from working is then already fixed and doesnot have the chance to compare with other atoms from reference anymore
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
 14.10.2020
     
     8_task5_cutoff_radius: 3rd idea for task5:
@@ -6,7 +18,7 @@
         collect only the relative distances smaller than cutoff_radius in the rel_dis matrix, fill the blank with a large max_rel_dis
         compare the rel_dis matrix and sort the atoms 
         
-
+        works worse than 2nd idea
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 13.10.2020
