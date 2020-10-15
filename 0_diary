@@ -9,6 +9,10 @@
         compare working with reference and calculate the deviations, find out the minimal deviation and switch the order
         is it possible that this atom from working has a smaller deviation with another atom in reference? 
         but this atom from working is then already fixed and doesnot have the chance to compare with other atoms from reference anymore
+    
+    suggestions from Johannes:
+        less distortion to molecules for task5, focus more on different functional groups
+        add information of chemical elements instead of angular information
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 14.10.2020
