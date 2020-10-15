@@ -6,6 +6,8 @@ aspirin_2.xyz: translated and rotated from aspirin_1 with different order of ato
 
 aspirin_3.xyz: slightly distorted from aspirin_2
 
+aspirin_CH3.xyz: some arbitrary replacement of atoms from aspirin_3
+
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 pent_A_center_R_1.xyz: reference coordinate
