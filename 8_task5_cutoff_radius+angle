@@ -5,7 +5,7 @@
 //      collect only the relative distances smaller than cutoff_radius in the rel_dis matrix, fill the blank with a large max_rel_dis
 //      add angular information into rel_dis matrix:
 //          calculate cosine of the angles of each atom (as origin) expanded with the neighbors within cutoff_radius
-//      compare the rel_dis matrix and sort the atoms
+//      compare the rel_dis matrix and sort the atoms: include element type comparison
 
 #include <iostream>
 #include <fstream>
@@ -34,7 +34,7 @@ int main()
     cout << fixed;
     fout << fixed;
     
-    fin.open("aspirin_1.xyz");
+    fin.open("pent_A_center_R_1.xyz");
     if (fin.fail())
         cout << "File failed to open." << endl;
     
@@ -53,7 +53,7 @@ int main()
     }
     fin.close();
     
-    fin.open("aspirin_CH3.xyz");
+    fin.open("pent_A_center_R_CH3_undis.xyz");
     if (fin.fail())
         cout << "File failed to open." << endl;
     
@@ -177,44 +177,78 @@ int main()
     
     for (i = 0; i < atom_num_0; i++) {
         
-        int num_neighbor_0 = 0;
+        int num_neighbor = 0;
         for (j = 0; j < atom_num_0; j++) {
-            if (rel_dis_0(i,j) < cutoff_radius) num_neighbor_0++;
+            if (rel_dis_0(i,j) < cutoff_radius) num_neighbor++;
         }
         
-        int count_0 = 0;
-        for (j = 0; j < num_neighbor_0 - 1; j++) {
-            for (k = j + 1; k < num_neighbor_0; k++) {
-                rel_dis_0(atom_num_1 + i, count_0) = (((coord_0(0,j) - coord_0(0,i)) * (coord_0(0,k) - coord_0(0,i)))
-                                                    + ((coord_0(1,j) - coord_0(1,i)) * (coord_0(1,k) - coord_0(1,i)))
-                                                    + ((coord_0(2,j) - coord_0(2,i)) * (coord_0(2,k) - coord_0(2,i))))
-                                                    / (rel_dis_0(i,j) * rel_dis_0(i,k));
-                count_0++;
+        int pointer_j = 0, count = 0;
+        
+        while (num_neighbor > 1) {
+            
+            int pointer_k = pointer_j + 1;
+            while (rel_dis_0(i, pointer_j) == 100) {
+                pointer_j++;
+                pointer_k++;
             }
+            
+            int sub_neighbor = num_neighbor - 1;
+            while (sub_neighbor > 0) {
+                while (rel_dis_0(i, pointer_k) == 100) {
+                    pointer_k++;
+                }
+                if (rel_dis_0(i, pointer_k) != 100) {
+                    rel_dis_0(atom_num_1 + i, count) = (((coord_0(0,pointer_j) - coord_0(0,i)) * (coord_0(0,pointer_k) - coord_0(0,i)))
+                                                        + ((coord_0(1,pointer_j) - coord_0(1,i)) * (coord_0(1,pointer_k) - coord_0(1,i)))
+                                                        + ((coord_0(2,pointer_j) - coord_0(2,i)) * (coord_0(2,pointer_k) - coord_0(2,i))))
+                                                        / (rel_dis_0(i,pointer_j) * rel_dis_0(i,pointer_k));
+                    sub_neighbor--;
+                    count++;
+                }
+
+            }
+            num_neighbor--;
+            pointer_j++;
         }
-        
     }
+    
     
     for (i = 0; i < atom_num_1; i++) {
         
         // count the number of neighbor atoms within cutoff_radius
         
-        int num_neighbor_1 = 0;
+        int num_neighbor = 0;
         for (j = 0; j < atom_num_1; j++) {
-            if (rel_dis_1(i,j) < cutoff_radius) num_neighbor_1++;
+            if (rel_dis_1(i,j) < cutoff_radius) num_neighbor++;
         }
         
-        // calculate the angular information: cosine
+        int pointer_j = 0, count = 0;
         
-        int count_1 = 0;
-        for (j = 0; j < num_neighbor_1 - 1; j++) {
-            for (k = j + 1; k < num_neighbor_1; k++) {
-                rel_dis_0(atom_num_1 + i, count_1) = (((coord_1(0,j) - coord_1(0,i)) * (coord_1(0,k) - coord_1(0,i)))
-                                                    + ((coord_1(1,j) - coord_1(1,i)) * (coord_1(1,k) - coord_1(1,i)))
-                                                    + ((coord_1(2,j) - coord_1(2,i)) * (coord_1(2,k) - coord_1(2,i))))
-                                                    / (rel_dis_1(i,j) * rel_dis_1(i,k));
-                count_1++;
+        while (num_neighbor > 1) {
+            
+            int pointer_k = pointer_j + 1;
+            while (rel_dis_1(i, pointer_j) == 100) {
+                pointer_j++;
+                pointer_k++;
             }
+            
+            int sub_neighbor = num_neighbor - 1;
+            while (sub_neighbor > 0) {
+                while (rel_dis_1(i, pointer_k) == 100) {
+                    pointer_k++;
+                }
+                if (rel_dis_1(i, pointer_k) != 100) {
+                    rel_dis_1(atom_num_1 + i, count) = (((coord_1(0,pointer_j) - coord_1(0,i)) * (coord_1(0,pointer_k) - coord_1(0,i)))
+                                                      + ((coord_1(1,pointer_j) - coord_1(1,i)) * (coord_1(1,pointer_k) - coord_1(1,i)))
+                                                      + ((coord_1(2,pointer_j) - coord_1(2,i)) * (coord_1(2,pointer_k) - coord_1(2,i))))
+                                                     / (rel_dis_1(i,pointer_j) * rel_dis_1(i,pointer_k));
+                    sub_neighbor--;
+                    count++;
+                }
+
+            }
+            num_neighbor--;
+            pointer_j++;
         }
     }
     
@@ -246,39 +280,45 @@ int main()
         }
     }
     
+    cout << "rel_dis_0:" << endl << rel_dis_0 << endl << endl;
+    cout << "rel_dis_1:" << endl << rel_dis_1 << endl << endl;
+    
     
     // compare the relative distances and angular information: switch the atom order in working coordinate
     
-    for (i = 0; i < atom_num_1; i++) {
+    for (i = 0; i < atom_num_0; i++) {
             
         double min_dev = 10000000;
         double dev_sum = 0;
             
         for (j = i; j < atom_num_1; j++) {
             dev_sum = 0;
-            for (k = 0; k < atom_num_1; k++) {
-                dev_sum = dev_sum + abs(rel_dis_0(i,k) - rel_dis_1(j,k)) + abs(rel_dis_0(atom_num_1 + i, k) - rel_dis_1(atom_num_1 + i, k));
-            }
-                
-    //            cout << i << " " << j << " " << dev_sum << " " << min_dev << endl;
-                    
-            if (dev_sum < min_dev) {
-                
-                for (k = 0; k < atom_num_1; k++){
-                    swap(rel_dis_1(i,k), rel_dis_1(j,k));
-                    swap(rel_dis_1(atom_num_1 + i, k), rel_dis_1(atom_num_1 + j, k));
+            
+            if (atom_type_0[i] == atom_type_1[j]) {
+                for (k = 0; k < atom_num_1; k++) {
+                    dev_sum = dev_sum + abs(rel_dis_0(i,k) - rel_dis_1(j,k)) + abs(rel_dis_0(atom_num_1 + i, k) - rel_dis_1(atom_num_1 + i, k));
                 }
-                
+                            
+//            cout << i << " " << j << " " << dev_sum << " " << min_dev << endl;
+                                
+                if (dev_sum < min_dev) {
+                            
+                    for (k = 0; k < atom_num_1; k++){
+                        swap(rel_dis_1(i,k), rel_dis_1(j,k));
+                        swap(rel_dis_1(atom_num_1 + i, k), rel_dis_1(atom_num_1 + j, k));
+                    }
+                            
                 for (k = 0; k < 3; k++)
                     swap(coord_1(k,i), coord_1(k,j));
-                
+                            
                 string temp = atom_type_1[i];
                 atom_type_1[i] = atom_type_1[j];
                 atom_type_1[j] = temp;
-                
+                            
                 min_dev = dev_sum;
+                }
             }
-    //            cout << min_dev << endl;
+    //            cout << min_dev << endl; 5.67533335
         }
     }
     
@@ -325,7 +365,7 @@ int main()
     I(2, 2) = d;
     Matrix3d RotMatrix = SVD.matrixV() * I * SVD.matrixU().transpose();
     
-    cout << "Rotation matrix: " << endl << RotMatrix << endl << endl;
+//    cout << "Rotation matrix: " << endl << RotMatrix << endl << endl;
     
 //    cout << (RotMatrix * coord_1).transpose() << endl;
     
