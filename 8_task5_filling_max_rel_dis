@@ -186,25 +186,29 @@ int main()
             
         for (j = i; j < atom_num_1; j++) {
             dev_sum = 0;
-            for (k = 0; k < atom_num_1; k++) {
-                dev_sum = dev_sum + abs(rel_dis_0(i,k) - rel_dis_1(j,k));
-            }
+            
+            if (atom_type_0[i] == atom_type_1[j]) {
                 
-    //            cout << i << " " << j << " " << dev_sum << " " << min_dev << endl;
-                    
-            if (dev_sum < min_dev) {
-                
-                for (k = 0; k < atom_num_1; k++)
-                    swap(rel_dis_1(i,k), rel_dis_1(j,k));
-                
-                for (k = 0; k < 3; k++)
-                    swap(coord_1(k,i), coord_1(k,j));
-                
-                string temp = atom_type_1[i];
-                atom_type_1[i] = atom_type_1[j];
-                atom_type_1[j] = temp;
-                
-                min_dev = dev_sum;
+                for (k = 0; k < atom_num_1; k++) {
+                    dev_sum = dev_sum + abs(rel_dis_0(i,k) - rel_dis_1(j,k));
+                }
+                            
+                //            cout << i << " " << j << " " << dev_sum << " " << min_dev << endl;
+                                
+                if (dev_sum < min_dev) {
+                            
+                    for (k = 0; k < atom_num_1; k++)
+                        swap(rel_dis_1(i,k), rel_dis_1(j,k));
+                            
+                    for (k = 0; k < 3; k++)
+                        swap(coord_1(k,i), coord_1(k,j));
+                            
+                    string temp = atom_type_1[i];
+                    atom_type_1[i] = atom_type_1[j];
+                    atom_type_1[j] = temp;
+                            
+                    min_dev = dev_sum;
+                }
             }
     //            cout << min_dev << endl;
         }
@@ -276,9 +280,9 @@ int main()
     cout << "the working coordinate with centroid at origin after rotation:" << endl << endl;
     
     for (i = 0; i < atom_num_1; i++) {
-        cout << atom_type_1[i] << " ";
+        cout << atom_type_1[i] << "\t";
         for (j = 0; j < 3; j++) {
-            cout << coord_2(j, i) << " ";
+            cout << coord_2(j, i) << "\t\t";
         }
         cout << endl;
     }
