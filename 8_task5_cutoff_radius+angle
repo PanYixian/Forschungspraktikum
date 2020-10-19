@@ -5,7 +5,8 @@
 //      collect only the relative distances smaller than cutoff_radius in the rel_dis matrix, fill the blank with a large max_rel_dis
 //      add angular information into rel_dis matrix:
 //          calculate cosine of the angles of each atom (as origin) expanded with the neighbors within cutoff_radius
-//      compare the rel_dis matrix and sort the atoms: include element type comparison
+//      compare the rel_dis matrix and sort the atoms:
+//          compare the element type before comparing distances and angular information
 
 #include <iostream>
 #include <fstream>
@@ -280,11 +281,12 @@ int main()
         }
     }
     
-    cout << "rel_dis_0:" << endl << rel_dis_0 << endl << endl;
-    cout << "rel_dis_1:" << endl << rel_dis_1 << endl << endl;
+//    cout << "rel_dis_0:" << endl << rel_dis_0 << endl << endl;
+//    cout << "rel_dis_1:" << endl << rel_dis_1 << endl << endl;
     
     
     // compare the relative distances and angular information: switch the atom order in working coordinate
+    // compare the element type before comparing distances and angular information
     
     for (i = 0; i < atom_num_0; i++) {
             
@@ -377,6 +379,16 @@ int main()
 //    cout << coord_0.transpose() << endl << endl;
 //    cout << coord_2.transpose() << endl << endl;
     
+    // move the reference coordinate back to original centroid_0, move working coordinate also to centroid_0
+    
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < atom_num_0; j++) {
+            coord_0(i, j) += centroid_0(i);
+        }
+        for (j = 0; j < atom_num_1; j++) {
+            coord_2(i, j) += centroid_0(i);
+        }
+    }
     
     cout << "the reference coordinate with centroid at origin:" << endl << endl;
     
