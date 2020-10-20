@@ -10,7 +10,7 @@ aspirin_4.xyz: replace one H with CH3, undistorted
 
 aspirin_5.xyz: replace two H with CH3, undistorted
 
-aspirin_CH3.xyz: some arbitrary replacement of atoms from aspirin_3
+aspirin_6.xyz: some arbitrary replacement of atoms from aspirin_3
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
