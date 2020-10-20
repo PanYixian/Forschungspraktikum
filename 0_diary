@@ -1,4 +1,18 @@
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+20.10.2020
+    
+    8_task5_filling_max_rel_dis: 2nd idea for task5:
+        implementing angular information of the 10 nearest neighbors of each atom in rel_dis matrix
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+19.10.2020
+    
+    8_task5_filling_max_rel_dis: 2nd idea for task5:
+        implement element type comparison
+        works well when replacing one H with CH3 for small molecule (aspirin), badly when replacing two H with CH3
+        works well when replace one or two H with CH3 (pent_A_center_R), badly when replacing three H with CH3
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
 16.10.2020
     
     include element type comparison for 2nd and 3rd idea:
@@ -8,7 +22,7 @@
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 15.10.2020
 
-    8_task5_cutoff_radius: 3rd idea for task5:
+    8_task5_cutoff_radius+angle: 3rd idea for task5:
         add angular information for each atom
             calculate cosine of the angles of each atom (as origin) expanded with the neighbors within cutoff_radius
         
