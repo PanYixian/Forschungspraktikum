@@ -6,6 +6,10 @@ aspirin_2.xyz: translated and rotated from aspirin_1 with different order of ato
 
 aspirin_3.xyz: slightly distorted from aspirin_2
 
+aspirin_4.xyz: replace one H with CH3, undistorted
+
+aspirin_5.xyz: replace two H with CH3, undistorted
+
 aspirin_CH3.xyz: some arbitrary replacement of atoms from aspirin_3
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
