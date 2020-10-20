@@ -1,0 +1,17 @@
+pan@linux11:~/Forschungs_praktikum/example_descriptor> ../aenet/bin/generate.x-2.0.4-gfortran_mkl_serial generate.in > generate.out 
+ Error: file already exists: aspirin.train
+pan@linux11:~/Forschungs_praktikum/example_descriptor> rm aspirin.train
+pan@linux11:~/Forschungs_praktikum/example_descriptor> ../aenet/bin/generate.x-2.0.4-gfortran_mkl_serial generate.in > generate.out 
+ Error: file not found in `geo_init': /home/linux1_i1/pan/Forschungs_praktikum/Forschungspraktikum/example_input/aspirin_CH3.xsf
+pan@linux11:~/Forschungs_praktikum/example_descriptor> ../aenet/bin/generate.x-2.0.4-gfortran_mkl_serial generate.in > generate.out 
+ Error: file already exists: aspirin.train
+pan@linux11:~/Forschungs_praktikum/example_descriptor> rm aspirin.train
+pan@linux11:~/Forschungs_praktikum/example_descriptor> ../aenet/bin/generate.x-2.0.4-gfortran_mkl_serial generate.in > generate.out 
+pan@linux11:~/Forschungs_praktikum/example_descriptor> ../aenet/tools/trnset2ASCII.x --raw aspirin.train aspirin.txt
+ Converting binary format to ASCII text format.
+ Done.
+pan@linux11:~/Forschungs_praktikum/example_descriptor> vi aspirin.txt
+
+
+
+pan@linux11:~/Forschungs_praktikum/Forschungspraktikum/example_input> sh conv_xyz_to_xsf.sh 
