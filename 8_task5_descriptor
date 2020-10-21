@@ -127,11 +127,7 @@ int main()
     }
     
     
-    // step3: construct atom-atom relative distance matrix rel_dis
-    
-    // build two square matrices for storing the relative distances
-    // find the maximal relative distance in rel_dis_0 for augmenting rel_dis_0
-    
+    // step3: use the descriptor information to construct the character matrix rel_dis
     
     
     int element_type_num, total_atom, total_struc, element_type_temp, element_type_num_0, element_type_num_1, desc_num = 0;
