@@ -135,7 +135,7 @@ int main()
     double struc_energy_0, struc_energy_1;
     string title, scale_symbol, scale_factor, shift_factor, element_type[100], struc_eneygy[100];
     string file_name_0, file_name_1, temp[3], element_type_0[100], subs_energy[100], element_type_1[100];
-    MatrixXd rel_dis_0 = MatrixXd::Zero(atom_num_0, descriptor_num), rel_dis_1 = MatrixXd::Zero(atom_num_1, descriptor_num);
+    MatrixXd rel_dis_0 = MatrixXd::Zero(atom_num_0, descriptor_num), rel_dis_1 = MatrixXd::Zero(max_atom_num, descriptor_num);
         
         
     fin.open("aenet_aspirin.txt");
