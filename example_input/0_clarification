@@ -20,6 +20,10 @@ pent_A_center_R_2.xyz: translated and rotated from pent_A_center_R_1 with differ
 
 pent_A_center_R_3.xyz: slightly distorted from pent_A_center_R_2
 
-pent_A_center_R_CH3.xyz: replace two H-atoms with CH3 in pent_A_center_R_3
+pent_A_center_R_4.xyz: replace two H-atoms with CH3 in pent_A_center_R_3, slight distortion
+
+pent_A_center_R_5.xyz: replace four H-atoms with CH3 in pent_A_center_R_3, slight distortion
+
+pent_A_center_R_6.xyz: replace two H-atoms with CH3 in pent_A_center_R_2, without distortion
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
