@@ -1,8 +1,12 @@
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
-20.10.2020
+28.10.2020
     
-    8_task5_filling_max_rel_dis: 2nd idea for task5:
+    8_task5_rel_dis+angle:
         implementing angular information of the 10 nearest neighbors of each atom in rel_dis matrix
+        works well
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+20.10.2020
     
     8_task5_descriptor:
         implement the descriptor information from April's code aenet
