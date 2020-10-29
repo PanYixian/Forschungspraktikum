@@ -44,7 +44,7 @@ int main(){
     }
     fin.close();
     
-    fin.open("aspirin_5.xyz");
+    fin.open("aspirin_3.xyz");
     if (fin.fail())
         cout << "File failed to open." << endl;
     
