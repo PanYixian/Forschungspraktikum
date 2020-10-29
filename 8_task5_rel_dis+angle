@@ -10,6 +10,16 @@ const int column_rel_dis = 100, neighbor = 10, num_angle_info = 45;
 // num_angle_info = neighbor*(neighbor-1)/2
 // for aspirin: const int column_rel_dis = 100, neighbor = 10, num_angle_info = 45;
 
+const string input_file = "aspirin_4.xyz";
+    // clarification for file_num, it decides which file's descriptor would be read in
+    // 2: aspirin_2 (translated and rotated from aspirin_1/reference with different order of atoms)
+    // 3: aspirin_3 (slightly distorted from aspirin_2)
+    // 4: aspirin_4 (replace one H with CH3, undistorted)
+    // 5: aspirin_5 (replace two H with CH3, undistorted)
+    // 6: aspirin_6 (some arbitrary replacement of atoms from aspirin_3, slightly distorted)
+
+
+
 int main(){
     
     // step1: read in the coordinates
@@ -44,7 +54,7 @@ int main(){
     }
     fin.close();
     
-    fin.open("aspirin_3.xyz");
+    fin.open(input_file);
     if (fin.fail())
         cout << "File failed to open." << endl;
     
@@ -236,9 +246,19 @@ int main(){
                 
             if (atom_type_0[i] == atom_type_1[j]) {
                
-                for (k = 0; k < num_angle_info; k++) {
-                    dev_sum = dev_sum + abs(rel_dis_0(i,k) - rel_dis_1(j,k)) + abs(rel_dis_0(atom_num_1 + i, k) - rel_dis_1(atom_num_1 + i, k));
+                if (atom_num_0 == atom_num_1) {
+                    for (k = 0; k < num_angle_info; k++) {
+                        dev_sum = dev_sum + abs(rel_dis_0(i,k) - rel_dis_1(j,k));
+                    }
+                } else {
+                    for (k = 0; k < num_angle_info; k++) {
+                        dev_sum = dev_sum + abs(rel_dis_0(i,k) - rel_dis_1(j,k)) + abs(rel_dis_0(atom_num_1 + i, k) - rel_dis_1(atom_num_1 + i, k));
+                    }
                 }
+                
+//                for (k = 0; k < num_angle_info; k++) {
+//                    dev_sum = dev_sum + abs(rel_dis_0(i,k) - rel_dis_1(j,k)) + abs(rel_dis_0(atom_num_1 + i, k) - rel_dis_1(atom_num_1 + i, k));
+//                }
                                                                   
                 if (dev_sum < min_dev) {
                     for (k = 0; k < atom_num_1; k++){
@@ -258,6 +278,7 @@ int main(){
         //            cout << min_dev << endl; 5.67533335
         }
     }
+    
         
         
     // construct reference and working coord with atom_num_0 atoms to apply Kabsch Algorithm
