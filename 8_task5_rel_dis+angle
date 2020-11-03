@@ -11,13 +11,16 @@ const int column_rel_dis = 100, neighbor = 10, num_angle_info = 45;
 // for aspirin: const int column_rel_dis = 100, neighbor = 10, num_angle_info = 45;
 
 const string input_file = "aspirin_4.xyz";
-    // clarification for file_num, it decides which file's descriptor would be read in
-    // 2: aspirin_2 (translated and rotated from aspirin_1/reference with different order of atoms)
-    // 3: aspirin_3 (slightly distorted from aspirin_2)
-    // 4: aspirin_4 (replace one H with CH3, undistorted)
-    // 5: aspirin_5 (replace two H with CH3, undistorted)
-    // 6: aspirin_6 (some arbitrary replacement of atoms from aspirin_3, slightly distorted)
+    // clarification for input_file, it decides which file would be read in
+        // aspirin_2.xyz (translated and rotated from aspirin_1/reference with different order of atoms)
+        // aspirin_3.xyz (slightly distorted from aspirin_2)
+        // aspirin_4.xyz (replace one H with CH3, undistorted)
+        // aspirin_5.xyz (replace two H with CH3, undistorted)
+        // aspirin_6.xyz (some arbitrary replacement of atoms from aspirin_3, slightly distorted)
 
+// insert the switch for using angle info: !!!
+    // turn off the use of angle info if the input files are with same structure (need translation and rotation to superimpose)
+    // turn on the use of angle info if the input files are with geometric distortion (same structure) or with different structures
 
 
 int main(){
@@ -41,7 +44,7 @@ int main(){
     
     fin >> atom_num_0;
     Matrix3Xd coord_0(3, atom_num_0);
-    string atom_type_0[500];
+    string atom_type_0[atom_num_0];
     
     // coordinate stored in column, 3*d matrix
     // read in the reference coordinate coord_0
@@ -72,12 +75,6 @@ int main(){
     }
     fin.close();
     
-//    // augment the array of element type of reference to the size of working and fill with "None"
-//    // currently not remember why....
-//
-//    for (i = atom_num_0; i < atom_num_1; i++) {
-//        atom_type_0[i] = "None";
-//    }
     
     
     // step2: calculate the centroids and translate both coordinate sets to origin
@@ -246,19 +243,19 @@ int main(){
                 
             if (atom_type_0[i] == atom_type_1[j]) {
                
-                if (atom_num_0 == atom_num_1) {
-                    for (k = 0; k < num_angle_info; k++) {
-                        dev_sum = dev_sum + abs(rel_dis_0(i,k) - rel_dis_1(j,k));
-                    }
-                } else {
-                    for (k = 0; k < num_angle_info; k++) {
-                        dev_sum = dev_sum + abs(rel_dis_0(i,k) - rel_dis_1(j,k)) + abs(rel_dis_0(atom_num_1 + i, k) - rel_dis_1(atom_num_1 + i, k));
-                    }
-                }
-                
-//                for (k = 0; k < num_angle_info; k++) {
-//                    dev_sum = dev_sum + abs(rel_dis_0(i,k) - rel_dis_1(j,k)) + abs(rel_dis_0(atom_num_1 + i, k) - rel_dis_1(atom_num_1 + i, k));
+//                if (atom_num_0 == atom_num_1) {
+//                    for (k = 0; k < num_angle_info; k++) {
+//                        dev_sum = dev_sum + abs(rel_dis_0(i,k) - rel_dis_1(j,k));
+//                    }
+//                } else {
+//                    for (k = 0; k < num_angle_info; k++) {
+//                        dev_sum = dev_sum + abs(rel_dis_0(i,k) - rel_dis_1(j,k)) + abs(rel_dis_0(atom_num_1 + i, k) - rel_dis_1(atom_num_1 + i, k));
+//                    }
 //                }
+                
+                for (k = 0; k < num_angle_info; k++) {
+                    dev_sum = dev_sum + abs(rel_dis_0(i,k) - rel_dis_1(j,k)) + abs(rel_dis_0(atom_num_1 + i, k) - rel_dis_1(atom_num_1 + i, k));
+                }
                                                                   
                 if (dev_sum < min_dev) {
                     for (k = 0; k < atom_num_1; k++){
