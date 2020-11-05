@@ -12,7 +12,7 @@ const int column_rel_dis = 100, neighbor = 10, num_angle_info = 45;
 
 const string input_file = "aspirin_3.xyz";
     // clarification for input_file, it decides which file would be read in
-        // aspirin_2.xyz (translated and rotated from aspirin_1/reference with different order of atoms)
+        // aspirin_2.xyz (translated and rotated from aspirin_2/reference with different order of atoms)
         // aspirin_3.xyz (slightly distorted from aspirin_2)
         // aspirin_4.xyz (replace one H with CH3, undistorted)
         // aspirin_5.xyz (replace two H with CH3, undistorted)
@@ -29,7 +29,7 @@ int main(){
     
     ifstream fin;
     ofstream fout;
-    int atom_num_0, atom_num_1;
+    int atom_num_1, atom_num_2;
     int i,j,k;
     cin.precision(8);
     cout.precision(8);
@@ -38,21 +38,21 @@ int main(){
     cout << fixed;
     fout << fixed;
     
-    fin.open("aspirin_1.xyz");
+    fin.open("aspirin_2.xyz");
     if (fin.fail())
         cout << "File failed to open." << endl;
     
-    fin >> atom_num_0;
-    Matrix3Xd coord_0(3, atom_num_0);
-    string atom_type_0[atom_num_0];
+    fin >> atom_num_1;
+    Matrix3Xd coord_1(3, atom_num_1);
+    string atom_type_1[atom_num_1];
     
     // coordinate stored in column, 3*d matrix
-    // read in the reference coordinate coord_0
+    // read in the reference coordinate coord_1
     
-    for (i = 0; i < atom_num_0; i++) {
-        fin >> atom_type_0[i];
+    for (i = 0; i < atom_num_1; i++) {
+        fin >> atom_type_1[i];
         for (j = 0; j < 3; j++) {
-            fin >> coord_0(j, i);
+            fin >> coord_1(j, i);
             }
     }
     fin.close();
@@ -61,16 +61,16 @@ int main(){
     if (fin.fail())
         cout << "File failed to open." << endl;
     
-    fin >> atom_num_1;
-    Matrix3Xd coord_1(3, atom_num_1);
-    string atom_type_1[atom_num_1];
+    fin >> atom_num_2;
+    Matrix3Xd coord_2(3, atom_num_2);
+    string atom_type_2[atom_num_2];
     
-    // read in the working coordinate coord_1
+    // read in the working coordinate coord_2
     
-    for (i = 0; i < atom_num_1; i++) {
-        fin >> atom_type_1[i];
+    for (i = 0; i < atom_num_2; i++) {
+        fin >> atom_type_2[i];
         for (j = 0; j < 3; j++) {
-            fin >> coord_1(j, i);
+            fin >> coord_2(j, i);
         }
     }
     fin.close();
@@ -79,16 +79,8 @@ int main(){
     
     // step2: calculate the centroids and translate both coordinate sets to origin
         
-    Vector3d centroid_0 = Vector3d::Zero(), centroid_1 = Vector3d::Zero();
+    Vector3d centroid_1 = Vector3d::Zero(), centroid_2 = Vector3d::Zero();
     
-    for (i = 0; i < 3; i++) {
-        double sum_0 = 0;
-        for (j = 0; j < atom_num_0; j++) {
-            sum_0 = sum_0 + coord_0(i, j);
-        }
-        centroid_0(i) = sum_0 / atom_num_0;
-    }
-        
     for (i = 0; i < 3; i++) {
         double sum_1 = 0;
         for (j = 0; j < atom_num_1; j++) {
@@ -97,16 +89,24 @@ int main(){
         centroid_1(i) = sum_1 / atom_num_1;
     }
         
-//    cout << "centroid of 1st file: " << endl << centroid_0 << endl;
-//    cout << "centroid of 2nd file: " << endl << centroid_1 << endl;
+    for (i = 0; i < 3; i++) {
+        double sum_2 = 0;
+        for (j = 0; j < atom_num_2; j++) {
+            sum_2 = sum_2 + coord_2(i, j);
+        }
+        centroid_2(i) = sum_2 / atom_num_2;
+    }
+        
+//    cout << "centroid of 1st file: " << endl << centroid_1 << endl;
+//    cout << "centroid of 2nd file: " << endl << centroid_2 << endl;
 //    cout << endl;
         
     for (i = 0; i < 3; i++) {
-        for (j = 0; j < atom_num_0; j++) {
-            coord_0(i, j) -= centroid_0(i);
-        }
         for (j = 0; j < atom_num_1; j++) {
             coord_1(i, j) -= centroid_1(i);
+        }
+        for (j = 0; j < atom_num_2; j++) {
+            coord_2(i, j) -= centroid_2(i);
         }
     }
     
@@ -115,42 +115,42 @@ int main(){
     // angular information from the nearest 10 neighbors of each atom
     
     
-    MatrixXd rel_dis_0 = MatrixXd::Zero(2 * atom_num_1, column_rel_dis), rel_dis_1 = MatrixXd::Zero(2 * atom_num_1, column_rel_dis);
-    vector<int> position(atom_num_1);
+    MatrixXd id_2 = MatrixXd::Zero(2 * atom_num_2, column_rel_dis), rel_dis_2 = MatrixXd::Zero(2 * atom_num_2, column_rel_dis);
+    vector<int> position(atom_num_2);
     double max_rel_dis = 0;
     
     // rel_dis matrix for reference coordinate
     
-    for (i = 0; i < atom_num_0; i++) {
+    for (i = 0; i < atom_num_1; i++) {
         
     // calculate the atom-atom distances for i-th atom, store the position of neighbors in position[j]
         
-        for (j = 0; j < atom_num_0; j++) {
-            rel_dis_0(i,j) = sqrt(pow((coord_0(0,i)-coord_0(0,j)), 2) +
-                                  pow((coord_0(1,i)-coord_0(1,j)), 2) +
-                                  pow((coord_0(2,i)-coord_0(2,j)), 2));
+        for (j = 0; j < atom_num_1; j++) {
+            id_2(i,j) = sqrt(pow((coord_1(0,i)-coord_1(0,j)), 2) +
+                                  pow((coord_1(1,i)-coord_1(1,j)), 2) +
+                                  pow((coord_1(2,i)-coord_1(2,j)), 2));
             position[j] = j;
-            if (rel_dis_0(i, j) > max_rel_dis) max_rel_dis = rel_dis_0(i, j);
+            if (id_2(i, j) > max_rel_dis) max_rel_dis = id_2(i, j);
         }
         
-        for (j = atom_num_0; j < atom_num_1; j++) {
-            rel_dis_0(i, j) = max_rel_dis;
+        for (j = atom_num_1; j < atom_num_2; j++) {
+            id_2(i, j) = max_rel_dis;
         }
         
     // sort it
         
-        for (j = 0; j < atom_num_0-1; j++) {
-            for (k = j+1; k < atom_num_0; k++) {
-                if (rel_dis_0(i,j) > rel_dis_0(i,k)){
-                    swap(rel_dis_0(i,j), rel_dis_0(i,k));
+        for (j = 0; j < atom_num_1-1; j++) {
+            for (k = j+1; k < atom_num_1; k++) {
+                if (id_2(i,j) > id_2(i,k)){
+                    swap(id_2(i,j), id_2(i,k));
                     swap(position[j], position[k]);
                 }
             }
         }
         
-//        for (j = 0; j < atom_num_0; j++) cout << rel_dis_0(i, j) << " ";
+//        for (j = 0; j < atom_num_1; j++) cout << id_2(i, j) << " ";
 //        cout << endl;
-//        for (j = 0; j < atom_num_0; j++) cout << position[j] << " ";
+//        for (j = 0; j < atom_num_1; j++) cout << position[j] << " ";
 //        cout << endl;
     
     // calculate the angular information for i-th atom with 10 nearest neighbors
@@ -158,12 +158,12 @@ int main(){
         int count = 0;
         for (j = 1; j < neighbor; j++) {
             for (k = j+1; k < neighbor+1; k++) {
-                rel_dis_0(atom_num_1 + i, count) = (((coord_0(0, position[j]) - coord_0(0,i)) * (coord_0(0, position[k]) - coord_0(0,i)))
-                                                  + ((coord_0(1, position[j]) - coord_0(1,i)) * (coord_0(1, position[k]) - coord_0(1,i)))
-                                                  + ((coord_0(2, position[j]) - coord_0(2,i)) * (coord_0(2, position[k]) - coord_0(2,i))))
-                                                 / (rel_dis_0(i, j) * rel_dis_0(i, k));
+                id_2(atom_num_2 + i, count) = (((coord_1(0, position[j]) - coord_1(0,i)) * (coord_1(0, position[k]) - coord_1(0,i)))
+                                                  + ((coord_1(1, position[j]) - coord_1(1,i)) * (coord_1(1, position[k]) - coord_1(1,i)))
+                                                  + ((coord_1(2, position[j]) - coord_1(2,i)) * (coord_1(2, position[k]) - coord_1(2,i))))
+                                                 / (id_2(i, j) * id_2(i, k));
                 
-//                cout << rel_dis_0(i, j) << " " << rel_dis_0(i, k) << " " << rel_dis_0(atom_num_1 + i, count) << " ";
+//                cout << id_2(i, j) << " " << id_2(i, k) << " " << id_2(atom_num_2 + i, count) << " ";
                 
                 count++;
             }
@@ -173,8 +173,8 @@ int main(){
         
         for (j = 0; j < num_angle_info-1; j++) {
             for (k = j+1; k < num_angle_info; k++) {
-                if (rel_dis_0(atom_num_1 + i, j) > rel_dis_0(atom_num_1 + i, k))
-                    swap(rel_dis_0(atom_num_1 + i, j), rel_dis_0(atom_num_1 + i, k));
+                if (id_2(atom_num_2 + i, j) > id_2(atom_num_2 + i, k))
+                    swap(id_2(atom_num_2 + i, j), id_2(atom_num_2 + i, k));
             }
         }
     }
@@ -184,21 +184,21 @@ int main(){
     
     // rel_dis matrix for working coordinate
     
-    for (i = 0; i < atom_num_1; i++) {
+    for (i = 0; i < atom_num_2; i++) {
             
-        for (j = 0; j < atom_num_1; j++) {
-            rel_dis_1(i,j) = sqrt(pow((coord_1(0,i)-coord_1(0,j)), 2) +
-                                  pow((coord_1(1,i)-coord_1(1,j)), 2) +
-                                  pow((coord_1(2,i)-coord_1(2,j)), 2));
+        for (j = 0; j < atom_num_2; j++) {
+            rel_dis_2(i,j) = sqrt(pow((coord_2(0,i)-coord_2(0,j)), 2) +
+                                  pow((coord_2(1,i)-coord_2(1,j)), 2) +
+                                  pow((coord_2(2,i)-coord_2(2,j)), 2));
             position[j] = j;
         }
             
         // sort it
             
-        for (j = 0; j < atom_num_1-1; j++) {
-            for (k = j+1; k < atom_num_1; k++) {
-                if (rel_dis_1(i,j) > rel_dis_1(i,k)){
-                    swap(rel_dis_1(i,j), rel_dis_1(i,k));
+        for (j = 0; j < atom_num_2-1; j++) {
+            for (k = j+1; k < atom_num_2; k++) {
+                if (rel_dis_2(i,j) > rel_dis_2(i,k)){
+                    swap(rel_dis_2(i,j), rel_dis_2(i,k));
                     swap(position[j], position[k]);
                 }
             }
@@ -209,10 +209,10 @@ int main(){
         int count = 0;
         for (j = 1; j < neighbor; j++) {
             for (k = j+1; k < neighbor+1; k++) {
-                rel_dis_1(atom_num_1 + i, count) = (((coord_1(0, position[j]) - coord_1(0,i)) * (coord_1(0, position[k]) - coord_1(0,i)))
-                                                  + ((coord_1(1, position[j]) - coord_1(1,i)) * (coord_1(1, position[k]) - coord_1(1,i)))
-                                                  + ((coord_1(2, position[j]) - coord_1(2,i)) * (coord_1(2, position[k]) - coord_1(2,i))))
-                                                  / (rel_dis_1(i, j) * rel_dis_1(i, k));
+                rel_dis_2(atom_num_2 + i, count) = (((coord_2(0, position[j]) - coord_2(0,i)) * (coord_2(0, position[k]) - coord_2(0,i)))
+                                                  + ((coord_2(1, position[j]) - coord_2(1,i)) * (coord_2(1, position[k]) - coord_2(1,i)))
+                                                  + ((coord_2(2, position[j]) - coord_2(2,i)) * (coord_2(2, position[k]) - coord_2(2,i))))
+                                                  / (rel_dis_2(i, j) * rel_dis_2(i, k));
                     
                count++;
             }
@@ -222,8 +222,8 @@ int main(){
             
         for (j = 0; j < num_angle_info-1; j++) {
             for (k = j+1; k < num_angle_info; k++) {
-                if (rel_dis_1(atom_num_1 + i, j) > rel_dis_1(atom_num_1 + i, k))
-                    swap(rel_dis_1(atom_num_1 + i, j), rel_dis_1(atom_num_1 + i, k));
+                if (rel_dis_2(atom_num_2 + i, j) > rel_dis_2(atom_num_2 + i, k))
+                    swap(rel_dis_2(atom_num_2 + i, j), rel_dis_2(atom_num_2 + i, k));
             }
         }
             
@@ -233,42 +233,42 @@ int main(){
     // compare the relative distances and angular information: switch the atom order in working coordinate
     // compare the element type before comparing distances and angular information
         
-    for (i = 0; i < atom_num_0; i++) {
+    for (i = 0; i < atom_num_1; i++) {
                 
         double min_dev = 10000000;
         double dev_sum = 0;
                 
-        for (j = i; j < atom_num_1; j++) {
+        for (j = i; j < atom_num_2; j++) {
             dev_sum = 0;
                 
-            if (atom_type_0[i] == atom_type_1[j]) {
+            if (atom_type_1[i] == atom_type_2[j]) {
                
                 if (same_atom_num == 0) {
                     for (k = 0; k < num_angle_info; k++) {
-                        dev_sum = dev_sum + abs(rel_dis_0(i,k) - rel_dis_1(j,k));
+                        dev_sum = dev_sum + abs(id_2(i,k) - rel_dis_2(j,k));
                     }
                 }
                 else {
                     for (k = 0; k < num_angle_info; k++) {
-                        dev_sum = dev_sum + abs(rel_dis_0(i,k) - rel_dis_1(j,k)) + abs(rel_dis_0(atom_num_1 + i, k) - rel_dis_1(atom_num_1 + i, k));
+                        dev_sum = dev_sum + abs(id_2(i,k) - rel_dis_2(j,k)) + abs(id_2(atom_num_2 + i, k) - rel_dis_2(atom_num_2 + i, k));
                     }
                 }
                 
 //                for (k = 0; k < num_angle_info; k++) {
-//                    dev_sum = dev_sum + abs(rel_dis_0(i,k) - rel_dis_1(j,k)) + abs(rel_dis_0(atom_num_1 + i, k) - rel_dis_1(atom_num_1 + i, k));
+//                    dev_sum = dev_sum + abs(id_2(i,k) - rel_dis_2(j,k)) + abs(id_2(atom_num_2 + i, k) - rel_dis_2(atom_num_2 + i, k));
 //                }
                                                                   
                 if (dev_sum < min_dev) {
-                    for (k = 0; k < atom_num_1; k++){
-                        swap(rel_dis_1(i,k), rel_dis_1(j,k));
-                        swap(rel_dis_1(atom_num_1 + i, k), rel_dis_1(atom_num_1 + j, k));
+                    for (k = 0; k < atom_num_2; k++){
+                        swap(rel_dis_2(i,k), rel_dis_2(j,k));
+                        swap(rel_dis_2(atom_num_2 + i, k), rel_dis_2(atom_num_2 + j, k));
                     }
                                 
-                    for (k = 0; k < 3; k++) swap(coord_1(k,i), coord_1(k,j));
+                    for (k = 0; k < 3; k++) swap(coord_2(k,i), coord_2(k,j));
                                 
-                    string temp = atom_type_1[i];
-                    atom_type_1[i] = atom_type_1[j];
-                    atom_type_1[j] = temp;
+                    string temp = atom_type_2[i];
+                    atom_type_2[i] = atom_type_2[j];
+                    atom_type_2[j] = temp;
                                 
                     min_dev = dev_sum;
                 }
@@ -279,29 +279,29 @@ int main(){
     
         
         
-    // construct reference and working coord with atom_num_0 atoms to apply Kabsch Algorithm
+    // construct reference and working coord with atom_num_1 atoms to apply Kabsch Algorithm
         
-    MatrixXd ref_coord(3, atom_num_0), work_coord(3, atom_num_0);
+    MatrixXd ref_coord(3, atom_num_1), work_coord(3, atom_num_1);
         
-    for (i = 0; i < atom_num_0; i++) {
+    for (i = 0; i < atom_num_1; i++) {
         for (j = 0; j < 3; j++) {
-            ref_coord(j,i) = coord_0(j,i);
-            work_coord(j,i) = coord_1(j,i);
+            ref_coord(j,i) = coord_1(j,i);
+            work_coord(j,i) = coord_2(j,i);
         }
     }
         
     // step4: apply Kabsch Algorithm
-    // 4-1: compute RMSD(coord_0, coord_1)
+    // 4-1: compute RMSD(coord_1, coord_2)
         
     double RMSD_before = 0;
         
-    for (int i = 0; i < atom_num_0; i++) {
+    for (int i = 0; i < atom_num_1; i++) {
         for (int j = 0; j < 3; j++) {
-            RMSD_before += pow(coord_0(j, i)-coord_1(j, i), 2);
+            RMSD_before += pow(coord_1(j, i)-coord_2(j, i), 2);
         }
     }
                 
-    RMSD_before = sqrt(RMSD_before / atom_num_0);
+    RMSD_before = sqrt(RMSD_before / atom_num_1);
         
     cout << "RMSD before rotation: " << RMSD_before << endl << endl;
     
@@ -323,33 +323,33 @@ int main(){
         
 //    cout << "Rotation matrix: " << endl << RotMatrix << endl << endl;
         
-//    cout << (RotMatrix * coord_1).transpose() << endl;
+//    cout << (RotMatrix * coord_2).transpose() << endl;
         
     // 4-4: rotate the 2nd molecule and calculate the RMSD again
         
-    Matrix3Xd coord_2(3, atom_num_1);
-    coord_2 = RotMatrix * coord_1;
+    Matrix3Xd coord_new(3, atom_num_2);
+    coord_new = RotMatrix * coord_2;
         
-//    cout << coord_0.transpose() << endl << endl;
+//    cout << coord_1.transpose() << endl << endl;
 //    cout << coord_2.transpose() << endl << endl;
         
-    // move the reference coordinate back to original centroid_0, move working coordinate also to centroid_0
+    // move the reference coordinate back to original centroid_1, move working coordinate also to centroid_1
         
     for (i = 0; i < 3; i++) {
-        for (j = 0; j < atom_num_0; j++) {
-            coord_0(i, j) += centroid_0(i);
-        }
         for (j = 0; j < atom_num_1; j++) {
-            coord_2(i, j) += centroid_0(i);
+            coord_1(i, j) += centroid_1(i);
+        }
+        for (j = 0; j < atom_num_2; j++) {
+            coord_new(i, j) += centroid_1(i);
         }
     }
         
     cout << "the reference coordinate with centroid at origin:" << endl << endl;
         
-    for (i = 0; i < atom_num_0; i++) {
-        cout << atom_type_0[i] << "\t";
+    for (i = 0; i < atom_num_1; i++) {
+        cout << atom_type_1[i] << "\t";
         for (j = 0; j < 3; j++) {
-            cout << coord_0(j, i) << "\t\t";
+            cout << coord_1(j, i) << "\t\t";
         }
         cout << endl;
     }
@@ -357,10 +357,10 @@ int main(){
         
     cout << "the working coordinate with centroid at origin after rotation:" << endl << endl;
         
-    for (i = 0; i < atom_num_1; i++) {
-        cout << atom_type_1[i] << "\t";
+    for (i = 0; i < atom_num_2; i++) {
+        cout << atom_type_2[i] << "\t";
         for (j = 0; j < 3; j++) {
-            cout << coord_2(j, i) << "\t\t";
+            cout << coord_new(j, i) << "\t\t";
         }
         cout << endl;
     }
@@ -368,24 +368,24 @@ int main(){
         
     double RMSD_after = 0;
         
-    for (int i = 0; i < atom_num_0; i++) {
+    for (int i = 0; i < atom_num_1; i++) {
         for (int j = 0; j < 3; j++) {
-            RMSD_after += pow(coord_0(j, i)-coord_2(j, i), 2);
+            RMSD_after += pow(coord_1(j, i)-coord_new(j, i), 2);
         }
     }
         
-    RMSD_after = sqrt(RMSD_after / atom_num_0);
+    RMSD_after = sqrt(RMSD_after / atom_num_1);
         
     cout << "RMSD after rotation: " << RMSD_after << endl << endl;
     
     // write the working coordinate into a file
     
     fout.open("work.xyz");
-    fout << atom_num_1 << endl << endl;
-    for (i = 0; i < atom_num_1; i++) {
-        fout << atom_type_1[i] << "\t";
+    fout << atom_num_2 << endl << endl;
+    for (i = 0; i < atom_num_2; i++) {
+        fout << atom_type_2[i] << "\t";
         for (j = 0; j < 3; j++) {
-            fout << coord_2(j, i) << "\t\t";
+            fout << coord_new(j, i) << "\t\t";
         }
         fout << endl;
     }
