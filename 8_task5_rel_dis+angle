@@ -1,3 +1,9 @@
+// some variable names are different from my presentation because I wanted to explain things in a clearer way
+// eg. the numbering of variables always start from 0 in the code instead of 1....
+// the code will be changed according to the presentation as soon as possible
+
+
+
 #include <iostream>
 #include <fstream>
 #include <vector>
