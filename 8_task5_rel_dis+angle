@@ -13,7 +13,7 @@ const int column_of_id = 100, neighbor = 10, num_angle_info = 45;
 // num_angle_info = neighbor*(neighbor-1)/2
 // for aspirin: const int column_of_id = 100, neighbor = 10, num_angle_info = 45;
 
-const string input_file = "aspirin_3.xyz";
+const string input_file = "pent_A_center_R_3.xyz";
     // clarification for input_file, it decides which file would be read in
         // aspirin_2.xyz (translated and rotated from aspirin_1/reference with different order of atoms)
         // aspirin_3.xyz (slightly distorted from aspirin_2)
@@ -41,7 +41,7 @@ int main(){
     cout << fixed;
     fout << fixed;
     
-    fin.open("aspirin_1.xyz");
+    fin.open("pent_A_center_R_1.xyz");
     if (fin.fail())
         cout << "File failed to open." << endl;
     
@@ -357,6 +357,35 @@ int main(){
     }
     cout << endl;
         
+    // in order to get the reorder of atoms perfect:
+    // after applying Kabsch Algorithm, look for the atom pairs with minimal distance in the superimposed molecules
+    
+    for (i = 0; i < atom_num_1; i++) {
+                
+        double min_dev = 10000000;
+        double dev_sum = 0;
+                
+        for (j = i; j < atom_num_2; j++) {
+            dev_sum = 0;
+                
+            if (atom_type_1[i] == atom_type_2[j]) {
+               
+                dev_sum = abs(coord_1(0, i) - coord_new(0, j)) + abs(coord_1(1, i) - coord_new(1, j)) + abs(coord_1(2, i) - coord_new(2, j));
+                
+                if (dev_sum < min_dev) {
+                                
+                    for (k = 0; k < 3; k++) swap(coord_new(k,i), coord_new(k,j));
+                                
+                    string temp = atom_type_2[i];
+                    atom_type_2[i] = atom_type_2[j];
+                    atom_type_2[j] = temp;
+                                
+                    min_dev = dev_sum;
+                }
+            }
+        }
+    }
+    
     double RMSD_after = 0;
         
     for (int i = 0; i < atom_num_1; i++) {
