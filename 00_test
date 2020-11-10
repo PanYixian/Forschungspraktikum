@@ -1,0 +1,437 @@
+// usage:
+// step1:  g++ test.cpp -o test.x
+// step2:  ./test.x structure1.xyz structure2.xyz
+
+
+
+#include <iostream>
+#include <fstream>
+#include <vector>
+
+// use the external libreary Eigen
+#include <eigen3/Eigen/Geometry>
+using namespace std;
+using namespace Eigen;
+
+// could increase the size of parameter for larger molecules
+const int column_of_id = 100, neighbor = 10, num_angle_info = 45;
+// column_of_id >= atom_num_2 + num_angle_info
+// num_angle_info = neighbor*(neighbor-1)/2
+// for aspirin: const int column_of_id = 100, neighbor = 10, num_angle_info = 45;
+
+// name of the 1st input file:
+const string input_file_1 = "pent_A_center_R_1.xyz";
+
+// name of the 2nd input file:
+const string input_file_2 = "pent_A_center_R_3.xyz";
+    // clarification for input_file, it decides which file would be read in
+        // aspirin_2.xyz (translated and rotated from aspirin_1/reference with different order of atoms)
+        // aspirin_3.xyz (slightly distorted from aspirin_2)
+        // aspirin_4.xyz (replace one H with CH3, undistorted)
+        // aspirin_5.xyz (replace two H with CH3, undistorted)
+        // aspirin_6.xyz (some arbitrary replacement of atoms from aspirin_3, slightly distorted)
+
+const int same_atom_num = 0; //or 1
+// 0: turn off the use of angle info when the input files are structures of the same molecule (same number of atoms)
+// 1: turn on the use of angle info when the input files are with composition difference (different number of atoms)
+
+
+int main(int argc, char **argv){
+
+    string inFile1 = "";
+    string inFile2 = "";
+    if( argc == 3 ) {
+        inFile1 = argv[1];
+        inFile2 = argv[2];
+    }
+    else {
+        cout << "Usage: ./test.x 1st_structure.xyz 2nd_structure.xyz\n";
+        return 1;
+    }
+    
+    // step1: read in the coordinates
+    
+    ifstream fin;
+    ofstream fout;
+    int atom_num_1, atom_num_2;
+    int i,j,k;
+    cin.precision(8);
+    cout.precision(8);
+    fin.precision(8);
+    fout.precision(8);
+    cout << fixed;
+    fout << fixed;
+    
+    fin.open(inFile1);
+    if (fin.fail())
+        cout << "File failed to open." << endl;
+    
+    fin >> atom_num_1;
+    Matrix3Xd coord_1(3, atom_num_1);
+    string atom_type_1[atom_num_1];
+    
+    // coordinate stored in column, 3*d matrix
+    // read in the reference coordinate coord_1
+    
+    for (i = 0; i < atom_num_1; i++) {
+        fin >> atom_type_1[i];
+        for (j = 0; j < 3; j++) {
+            fin >> coord_1(j, i);
+            }
+    }
+    fin.close();
+    
+    fin.open(inFile2);
+    if (fin.fail())
+        cout << "File failed to open." << endl;
+    
+    fin >> atom_num_2;
+    Matrix3Xd coord_2(3, atom_num_2);
+    string atom_type_2[atom_num_2];
+    
+    // read in the working coordinate coord_2
+    
+    for (i = 0; i < atom_num_2; i++) {
+        fin >> atom_type_2[i];
+        for (j = 0; j < 3; j++) {
+            fin >> coord_2(j, i);
+        }
+    }
+    fin.close();
+    
+    
+    
+    // step2: calculate the centroids and translate both coordinate sets to origin
+        
+    Vector3d centroid_1 = Vector3d::Zero(), centroid_2 = Vector3d::Zero();
+    
+    for (i = 0; i < 3; i++) {
+        double sum_1 = 0;
+        for (j = 0; j < atom_num_1; j++) {
+            sum_1 = sum_1 + coord_1(i, j);
+        }
+        centroid_1(i) = sum_1 / atom_num_1;
+    }
+        
+    for (i = 0; i < 3; i++) {
+        double sum_2 = 0;
+        for (j = 0; j < atom_num_2; j++) {
+            sum_2 = sum_2 + coord_2(i, j);
+        }
+        centroid_2(i) = sum_2 / atom_num_2;
+    }
+        
+//    cout << "centroid of 1st file: " << endl << centroid_1 << endl;
+//    cout << "centroid of 2nd file: " << endl << centroid_2 << endl;
+//    cout << endl;
+        
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < atom_num_1; j++) {
+            coord_1(i, j) -= centroid_1(i);
+        }
+        for (j = 0; j < atom_num_2; j++) {
+            coord_2(i, j) -= centroid_2(i);
+        }
+    }
+    
+    
+    // step3: construct id matrix with distance and angular information
+    // angular information from the nearest 10 neighbors of each atom
+    
+    
+    MatrixXd id_1 = MatrixXd::Zero(2 * atom_num_2, column_of_id), id_2 = MatrixXd::Zero(2 * atom_num_2, column_of_id);
+    vector<int> position(atom_num_2);
+    double max_id = 0;
+    
+    // id matrix for reference coordinate
+    
+    for (i = 0; i < atom_num_1; i++) {
+        
+    // calculate the atom-atom distances for i-th atom, store the position of neighbors in position[j]
+        
+        for (j = 0; j < atom_num_1; j++) {
+            id_1(i,j) = sqrt(pow((coord_1(0,i)-coord_1(0,j)), 2) +
+                             pow((coord_1(1,i)-coord_1(1,j)), 2) +
+                             pow((coord_1(2,i)-coord_1(2,j)), 2));
+            position[j] = j;
+            if (id_1(i, j) > max_id) max_id = id_1(i, j);
+        }
+        
+        for (j = atom_num_1; j < atom_num_2; j++) {
+            id_1(i, j) = max_id;
+        }
+        
+    // sort it
+        
+        for (j = 0; j < atom_num_1-1; j++) {
+            for (k = j+1; k < atom_num_1; k++) {
+                if (id_1(i,j) > id_1(i,k)){
+                    swap(id_1(i,j), id_1(i,k));
+                    swap(position[j], position[k]);
+                }
+            }
+        }
+
+    
+    // calculate the angular information for i-th atom with 10 nearest neighbors
+        
+        int count = 0;
+        for (j = 1; j < neighbor; j++) {
+            for (k = j+1; k < neighbor+1; k++) {
+                id_1(atom_num_2 + i, count) = (((coord_1(0, position[j]) - coord_1(0,i)) * (coord_1(0, position[k]) - coord_1(0,i)))
+                                             + ((coord_1(1, position[j]) - coord_1(1,i)) * (coord_1(1, position[k]) - coord_1(1,i)))
+                                             + ((coord_1(2, position[j]) - coord_1(2,i)) * (coord_1(2, position[k]) - coord_1(2,i))))
+                                             / (id_1(i, j) * id_1(i, k));
+                               
+                count++;
+            }
+        }
+    
+    // sort the angular information
+        
+        for (j = 0; j < num_angle_info-1; j++) {
+            for (k = j+1; k < num_angle_info; k++) {
+                if (id_1(atom_num_2 + i, j) > id_1(atom_num_2 + i, k))
+                    swap(id_1(atom_num_2 + i, j), id_1(atom_num_2 + i, k));
+            }
+        }
+    }
+
+    
+    // id matrix for working coordinate
+    
+    for (i = 0; i < atom_num_2; i++) {
+            
+        for (j = 0; j < atom_num_2; j++) {
+            id_2(i,j) = sqrt(pow((coord_2(0,i)-coord_2(0,j)), 2) +
+                             pow((coord_2(1,i)-coord_2(1,j)), 2) +
+                             pow((coord_2(2,i)-coord_2(2,j)), 2));
+            position[j] = j;
+        }
+            
+        // sort it
+            
+        for (j = 0; j < atom_num_2-1; j++) {
+            for (k = j+1; k < atom_num_2; k++) {
+                if (id_2(i,j) > id_2(i,k)){
+                    swap(id_2(i,j), id_2(i,k));
+                    swap(position[j], position[k]);
+                }
+            }
+        }
+        
+        // calculate the angular information for i-th atom with 10 nearest neighbors
+            
+        int count = 0;
+        for (j = 1; j < neighbor; j++) {
+            for (k = j+1; k < neighbor+1; k++) {
+                id_2(atom_num_2 + i, count) = (((coord_2(0, position[j]) - coord_2(0,i)) * (coord_2(0, position[k]) - coord_2(0,i)))
+                                             + ((coord_2(1, position[j]) - coord_2(1,i)) * (coord_2(1, position[k]) - coord_2(1,i)))
+                                             + ((coord_2(2, position[j]) - coord_2(2,i)) * (coord_2(2, position[k]) - coord_2(2,i))))
+                                             / (id_2(i, j) * id_2(i, k));
+                    
+               count++;
+            }
+        }
+        
+        // sort the angular information
+            
+        for (j = 0; j < num_angle_info-1; j++) {
+            for (k = j+1; k < num_angle_info; k++) {
+                if (id_2(atom_num_2 + i, j) > id_2(atom_num_2 + i, k))
+                    swap(id_2(atom_num_2 + i, j), id_2(atom_num_2 + i, k));
+            }
+        }
+    }
+    
+
+    // compare the relative distances and angular information: switch the atom order in working coordinate
+    // compare the element type before comparing distances and angular information
+        
+    for (i = 0; i < atom_num_1; i++) {
+                
+        double min_dev = 10000000;
+        double dev_sum = 0;
+                
+        for (j = i; j < atom_num_2; j++) {
+            dev_sum = 0;
+                
+            if (atom_type_1[i] == atom_type_2[j]) {
+               
+                if (same_atom_num == 0) {
+                    for (k = 0; k < atom_num_2; k++) {
+                        dev_sum = dev_sum + abs(id_1(i,k) - id_2(j,k));
+                    }
+                }
+                else {
+                    for (k = 0; k < atom_num_2; k++) {
+                        dev_sum = dev_sum + abs(id_1(i,k) - id_2(j,k));
+                    }
+                    for (k = 0; k < num_angle_info; k++) {
+                        dev_sum = dev_sum + abs(id_1(atom_num_2 + i, k) - id_2(atom_num_2 + i, k));
+                    }
+                }
+                
+                                                                  
+                if (dev_sum < min_dev) {
+                    for (k = 0; k < atom_num_2; k++){
+                        swap(id_2(i,k), id_2(j,k));
+                        swap(id_2(atom_num_2 + i, k), id_2(atom_num_2 + j, k));
+                    }
+                                
+                    for (k = 0; k < 3; k++) swap(coord_2(k,i), coord_2(k,j));
+                                
+                    string temp = atom_type_2[i];
+                    atom_type_2[i] = atom_type_2[j];
+                    atom_type_2[j] = temp;
+                                
+                    min_dev = dev_sum;
+                }
+            }
+        }
+    }
+    
+        
+        
+    // construct reference and working coord with atom_num_0 atoms to apply Kabsch Algorithm
+        
+    MatrixXd ref_coord(3, atom_num_1), work_coord(3, atom_num_1);
+        
+    for (i = 0; i < atom_num_1; i++) {
+        for (j = 0; j < 3; j++) {
+            ref_coord(j,i) = coord_1(j,i);
+            work_coord(j,i) = coord_2(j,i);
+        }
+    }
+        
+    // step4: apply Kabsch Algorithm
+    // 4-1: compute RMSD(coord_1, coord_2)
+        
+    double RMSD_before = 0;
+        
+    for (int i = 0; i < atom_num_1; i++) {
+        for (int j = 0; j < 3; j++) {
+            RMSD_before += pow(coord_1(j, i)-coord_2(j, i), 2);
+        }
+    }
+                
+    RMSD_before = sqrt(RMSD_before / atom_num_1);
+        
+    cout << "RMSD before rotation: " << RMSD_before << endl << endl;
+    
+    // 4-2: SVD
+    MatrixXd CovMatrix = work_coord * ref_coord.transpose();
+    JacobiSVD<MatrixXd> SVD(CovMatrix, ComputeThinU | ComputeThinV);
+        
+    // 4-3: find the rotation matrix
+    double d = (SVD.matrixV() * SVD.matrixU().transpose()).determinant();
+        
+    if (d > 0)
+        d = 1.0;
+    else
+        d = -1.0;
+    
+    Matrix3d I = Matrix3d::Identity(3, 3);
+    I(2, 2) = d;
+    Matrix3d RotMatrix = SVD.matrixV() * I * SVD.matrixU().transpose();
+        
+//    cout << "Rotation matrix: " << endl << RotMatrix << endl << endl;
+        
+//    cout << (RotMatrix * coord_1).transpose() << endl;
+        
+    // 4-4: rotate the 2nd molecule and calculate the RMSD again
+        
+    Matrix3Xd coord_new(3, atom_num_2);
+    coord_new = RotMatrix * coord_2;
+
+        
+    // move the reference coordinate back to original centroid_1, move working coordinate also to centroid_1
+        
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < atom_num_1; j++) {
+            coord_1(i, j) += centroid_1(i);
+        }
+        for (j = 0; j < atom_num_2; j++) {
+            coord_new(i, j) += centroid_1(i);
+        }
+    }
+        
+    cout << "the reference coordinate with centroid at origin:" << endl << endl;
+        
+    for (i = 0; i < atom_num_1; i++) {
+        cout << atom_type_1[i] << "\t";
+        for (j = 0; j < 3; j++) {
+            cout << coord_1(j, i) << "\t\t";
+        }
+        cout << endl;
+    }
+    cout << endl;
+        
+    cout << "the working coordinate with centroid at origin after rotation:" << endl << endl;
+        
+    for (i = 0; i < atom_num_2; i++) {
+        cout << atom_type_2[i] << "\t";
+        for (j = 0; j < 3; j++) {
+            cout << coord_new(j, i) << "\t\t";
+        }
+        cout << endl;
+    }
+    cout << endl;
+        
+    // in order to get the reorder of atoms perfect:
+    // after applying Kabsch Algorithm, look for the atom pairs with minimal distance in the superimposed molecules
+    
+    for (i = 0; i < atom_num_1; i++) {
+                
+        double min_dev = 10000000;
+        double dev_sum = 0;
+                
+        for (j = i; j < atom_num_2; j++) {
+            dev_sum = 0;
+                
+            if (atom_type_1[i] == atom_type_2[j]) {
+               
+                dev_sum = abs(coord_1(0, i) - coord_new(0, j)) + abs(coord_1(1, i) - coord_new(1, j)) + abs(coord_1(2, i) - coord_new(2, j));
+                
+                if (dev_sum < min_dev) {
+                                
+                    for (k = 0; k < 3; k++) swap(coord_new(k,i), coord_new(k,j));
+                                
+                    string temp = atom_type_2[i];
+                    atom_type_2[i] = atom_type_2[j];
+                    atom_type_2[j] = temp;
+                                
+                    min_dev = dev_sum;
+                }
+            }
+        }
+    }
+    
+    double RMSD_after = 0;
+        
+    for (int i = 0; i < atom_num_1; i++) {
+        for (int j = 0; j < 3; j++) {
+            RMSD_after += pow(coord_1(j, i)-coord_new(j, i), 2);
+        }
+    }
+        
+    RMSD_after = sqrt(RMSD_after / atom_num_1);
+        
+    cout << "RMSD after rotation: " << RMSD_after << endl << endl;
+    
+    // write the working coordinate into a file
+    
+    fout.open("work.xyz");
+    fout << atom_num_2 << endl << endl;
+    for (i = 0; i < atom_num_2; i++) {
+        fout << atom_type_2[i] << "\t";
+        for (j = 0; j < 3; j++) {
+            fout << coord_new(j, i) << "\t\t";
+        }
+        fout << endl;
+    }
+    fout.close();
+    
+    
+    return 0;
+}
