@@ -1,7 +1,6 @@
 // usage:
 // step1:  g++ test.cpp -o test.x
-// step2:  ./test.x structure1.xyz structure2.xyz
-
+// step2:  ./test.x s1.xyz s2.xyz
 
 
 #include <iostream>
@@ -10,6 +9,7 @@
 
 // use the external libreary Eigen
 #include <eigen3/Eigen/Geometry>
+
 using namespace std;
 using namespace Eigen;
 
@@ -20,10 +20,10 @@ const int column_of_id = 100, neighbor = 10, num_angle_info = 45;
 // for aspirin: const int column_of_id = 100, neighbor = 10, num_angle_info = 45;
 
 // name of the 1st input file:
-const string input_file_1 = "pent_A_center_R_1.xyz";
+//const string input_file_1 = "pent_A_center_R_1.xyz";
 
 // name of the 2nd input file:
-const string input_file_2 = "pent_A_center_R_3.xyz";
+//const string input_file_2 = "pent_A_center_R_3.xyz";
     // clarification for input_file, it decides which file would be read in
         // aspirin_2.xyz (translated and rotated from aspirin_1/reference with different order of atoms)
         // aspirin_3.xyz (slightly distorted from aspirin_2)
@@ -67,6 +67,10 @@ int main(int argc, char **argv){
         cout << "File failed to open." << endl;
     
     fin >> atom_num_1;
+    
+    string energy[4];                                  //deal with the second line concerning energy
+    for (int i = 0; i < 4; i++) fin >> energy[i];
+    
     Matrix3Xd coord_1(3, atom_num_1);
     string atom_type_1[atom_num_1];
     
@@ -86,6 +90,9 @@ int main(int argc, char **argv){
         cout << "File failed to open." << endl;
     
     fin >> atom_num_2;
+    
+    for (int i = 0; i < 4; i++) fin >> energy[i];
+    
     Matrix3Xd coord_2(3, atom_num_2);
     string atom_type_2[atom_num_2];
     
@@ -317,7 +324,7 @@ int main(int argc, char **argv){
                 
     RMSD_before = sqrt(RMSD_before / atom_num_1);
         
-    cout << "RMSD before rotation: " << RMSD_before << endl << endl;
+    cout << "RMSD after translation and before rotation: " << RMSD_before << endl << endl;
     
     // 4-2: SVD
     MatrixXd CovMatrix = work_coord * ref_coord.transpose();
@@ -356,27 +363,27 @@ int main(int argc, char **argv){
         }
     }
         
-    cout << "the reference coordinate with centroid at origin:" << endl << endl;
-        
-    for (i = 0; i < atom_num_1; i++) {
-        cout << atom_type_1[i] << "\t";
-        for (j = 0; j < 3; j++) {
-            cout << coord_1(j, i) << "\t\t";
-        }
-        cout << endl;
-    }
-    cout << endl;
-        
-    cout << "the working coordinate with centroid at origin after rotation:" << endl << endl;
-        
-    for (i = 0; i < atom_num_2; i++) {
-        cout << atom_type_2[i] << "\t";
-        for (j = 0; j < 3; j++) {
-            cout << coord_new(j, i) << "\t\t";
-        }
-        cout << endl;
-    }
-    cout << endl;
+//    cout << "the reference coordinate with centroid at origin:" << endl << endl;
+//
+//    for (i = 0; i < atom_num_1; i++) {
+//        cout << atom_type_1[i] << "\t";
+//        for (j = 0; j < 3; j++) {
+//            cout << coord_1(j, i) << "\t\t";
+//        }
+//        cout << endl;
+//    }
+//    cout << endl;
+//
+//    cout << "the working coordinate with centroid at origin after rotation:" << endl << endl;
+//
+//    for (i = 0; i < atom_num_2; i++) {
+//        cout << atom_type_2[i] << "\t";
+//        for (j = 0; j < 3; j++) {
+//            cout << coord_new(j, i) << "\t\t";
+//        }
+//        cout << endl;
+//    }
+//    cout << endl;
         
     // in order to get the reorder of atoms perfect:
     // after applying Kabsch Algorithm, look for the atom pairs with minimal distance in the superimposed molecules
@@ -421,8 +428,10 @@ int main(int argc, char **argv){
     
     // write the working coordinate into a file
     
-    fout.open("work.xyz");
-    fout << atom_num_2 << endl << endl;
+    fout.open(inFile2);
+    fout << atom_num_2 << endl;
+    for (int i = 0; i < 4; i++) fout << energy[i] << " ";
+    fout << endl;
     for (i = 0; i < atom_num_2; i++) {
         fout << atom_type_2[i] << "\t";
         for (j = 0; j < 3; j++) {
